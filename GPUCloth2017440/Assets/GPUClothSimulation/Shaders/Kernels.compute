@@ -93,6 +93,7 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 	float  invMass = _InverseMass;
 	
 	// 如果是布的顶部，为了固定位置不计算
+	// 此处控制哪些部分保持不动
 	if (idx.y >= _ClothResolution.y - 5)
 		return;
 

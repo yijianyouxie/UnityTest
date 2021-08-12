@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace GPUClothSimulation
@@ -108,8 +105,8 @@ namespace GPUClothSimulation
             if (Input.GetKeyUp("r"))
                 ResetBuffer();
 
-            //模拟前设定披风根部的位置
-            SetPifengRootPos();
+            ////模拟前设定披风根部的位置
+            //SetPifengRootPos();
 
             // 进行模拟
             Simulation();
@@ -130,7 +127,7 @@ namespace GPUClothSimulation
             // 绘制包含模拟数据的RT以进行调试
             DrawSimulationBufferOnGUI();
 
-            //DrawComputeSupport();
+            DrawComputeSupport();
         }
         
         // 重置模拟用的数据
@@ -369,28 +366,34 @@ namespace GPUClothSimulation
         private string str = "";
         void DrawComputeSupport()
         {
+            float textAreaWidth = 600f;
             GUIStyle titleStyle2 = new GUIStyle();
             titleStyle2.fontSize = 20;
             titleStyle2.normal.textColor = new Color(256f / 256f, 163f / 256f, 256f / 256f, 256f / 256f);
             //是否支持computeShader
-            GUI.Label(new UnityEngine.Rect(Screen.width * 1 / 2, 90, 150, 20), "是否支持ComputeShader：" + SystemInfo.supportsComputeShaders, titleStyle2);
-            //当前设备的opengl ES版本
-            GUI.Label(new UnityEngine.Rect(Screen.width * 1 / 2, 120, 150, 20), "OpenGL ES：" + GetOpenGL(), titleStyle2);
+            GUI.Label(new UnityEngine.Rect(textAreaWidth+20, 0, 150, 20), "是否支持ComputeShader：" + SystemInfo.supportsComputeShaders, titleStyle2);
+            //当前设备的Graphics API版本
+            GUI.Label(new UnityEngine.Rect(textAreaWidth + 20, 30, 150, 20), "GraphicsDeviceType：" + GetGraphicsDeviceType(), titleStyle2);
+            //当前设备的GPU型号
+            GUI.Label(new UnityEngine.Rect(textAreaWidth + 20, 60, 150, 50), "GPU：" + SystemInfo.graphicsDeviceName, titleStyle2);
 
-            if(GUI.Button(new UnityEngine.Rect(Screen.width * 1 / 2, 150, 150, 50), "重置RT"))
+            if (GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 150, 150, 50), "重置RT"))
             {
                 ResetBuffer();
             }
 
             //执行过程
-            str = GUI.TextArea(new Rect(0, 0, 600, 800), str);
-            if (GUI.Button(new UnityEngine.Rect(Screen.width * 1 / 2, 210, 150, 50), "清空日志"))
+            str = GUI.TextArea(new Rect(0, 0, textAreaWidth, 800), str);
+            if (GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 210, 150, 50), "清空日志"))
             {
                 str = "";
             }
         }
-        public static string GetOpenGL()
+        public static string GetGraphicsDeviceType()
         {
+            string graphicVersion = SystemInfo.graphicsDeviceType.ToString();
+            return graphicVersion;
+
             string version = "0";
 #if (UNITY_ANDROID && !UNITY_EDITOR)
             try
