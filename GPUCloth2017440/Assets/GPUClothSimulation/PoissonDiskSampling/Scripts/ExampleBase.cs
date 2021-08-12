@@ -12,7 +12,7 @@ namespace PoissonDiskSampling
 
         [Header("For Sampling")]
         [SerializeField]
-        protected T bottomLeftBack = default(T);
+        protected T bottomLeftBack = default(T);//修改default-default(T)
         [SerializeField]
         protected T topRightForward = default(T);
         [SerializeField]
