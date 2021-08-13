@@ -1,0 +1,33 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+
+float4 color;
+float time;
+
+float4 colors[10];
+
+[numthreads(16,16,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+	// TODO: insert actual code here!
+	//画方格
+	//Result[id.xy] = float4(id.x%32, id.y%32, 0, 0);
+
+	//画圆
+	//float2 uv = float2(id.x % 64, id.y%64)/64;
+	////float dis = (distance(uv, float2(32, 32))) / 32;
+	//float dis = ( distance(uv, float2(0.5,0.5)))*2;
+	//Result[id.xy] = float4(1 - dis,0,0,0);
+
+	////颜色
+	//Result[id.xy] = color + sin(time).xxxx;
+
+	//数组颜色
+	//int index = id.x % 10;
+	//Result[id.xy] = colors[index] + sin(time).xxxx;
+	Result[id.xy] = float4(1,0,0,1);
+}
