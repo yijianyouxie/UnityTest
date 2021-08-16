@@ -1,0 +1,189 @@
+﻿#pragma kernel CSInitTwoRT
+#pragma kernel CSSimulationTwoRT
+
+#define NUM_THREADS_XY 32 // 内核的线程数
+#define ANCHORSIZE 2 // 锚定固定不变的部分的大小
+
+// 用于读取位置数据(前一个时间步长)
+Texture2D<float4>   _PositionPrevBufferRO;
+// 用于读取位置数据
+Texture2D<float4>   _PositionBufferRO;
+// 位置数据(前一个时间步长)写入
+RWTexture2D<float4> _PositionPrevBufferRW;
+// 位置数据写入用
+RWTexture2D<float4> _PositionBufferRW;
+// 法线数据写入用
+RWTexture2D<float4> _NormalBufferRW;
+
+int2   _ClothResolution;  // 布的分辨率(大小)(横，纵)
+float2 _TotalClothLength; // 布的总长度
+
+float  _RestLength;		  // 弹簧的自然长度
+
+float3 _Gravity;		  // 重力
+float  _Stiffness;	      // 决定布的伸缩程度的常数
+float  _Damp;			  // 布的速度衰减率
+float  _InverseMass;	  // 1.0/質量
+
+float  _TimeStep;		  // 时间步长的大小
+
+bool   _EnableCollideSphere; // 是否进行碰撞处理的标志
+float4 _CollideSphereParams; // 碰撞处理参数(pos.xyz, radius)
+
+float3 _NeckPosition;//模拟脖子的位置
+
+// 邻近分区的ID偏移(x, y)的排列
+static const int2 m_Directions[12] =
+{
+	int2(-1, -1), //  0
+	int2( 0, -1), //  1
+	int2( 1, -1), //  2
+	int2( 1,  0), //  3
+	int2( 1,  1), //  4
+	int2( 0,  1), //  5
+	int2(-1,  1), //  6
+	int2(-1,  0), //  7
+	int2(-2, -2), //  8
+	int2( 2, -2), //  9
+	int2( 2,  2), // 10
+	int2(-2,  2)  // 11
+};
+// 返回邻近分区的ID的偏移。
+int2 NextNeigh(int n)
+{
+	return m_Directions[n];
+}
+
+// 初始化模拟缓存器的内核
+[numthreads(NUM_THREADS_XY, NUM_THREADS_XY, 1)]
+void CSInitTwoRT(uint3 DTid : SV_DispatchThreadID)
+{
+	//在这里进行了初始RT的顶点位置信息模拟，都是从0开始的
+	uint2 idx = DTid.xy;
+
+	// 位置(设定每个小节点的位置，索引是从0-64.组是2，每个组里是32)
+	float3 pos = float3(idx.x * _RestLength, idx.y * _RestLength, 0);
+	//设置小节点的偏移
+	pos.xy -= _TotalClothLength.xy * 0.5;
+	// 法线
+	float3 nrm = float3(0, 0, -1);
+	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
+	{
+		pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+	}
+	// 写入缓冲区
+	_PositionPrevBufferRW[idx] = float4(pos.xyz, 1.0);
+	_PositionBufferRW[idx]     = float4(pos.xyz, 1.0);
+	_NormalBufferRW[idx]       = float4(nrm.xyz, 1.0);
+}
+
+// 进行模拟的内核
+[numthreads(NUM_THREADS_XY, NUM_THREADS_XY, 1)]
+void CSSimulationTwoRT(uint2 DTid : SV_DispatchThreadID)
+{
+	int2 idx = (int2)DTid.xy;
+	// 布的分辨率(大小)(横，纵)
+	int2   res = _ClothResolution.xy;
+	// 读取位置
+	float3 pos = _PositionBufferRW[idx.xy].xyz;
+	// 位置(前一个时间步骤)的读取
+	float3 posPrev = _PositionPrevBufferRW[idx.xy].xyz;
+	// 根据位置和前一个时间步的位置计算速度
+	float3 vel = (pos - posPrev) / _TimeStep;
+
+	float3 normal   = (float3)0; // 法线
+	float3 lastDiff = (float3)0; // 法线计算时使用的方向矢量存储用变量
+	float  iters    = 0.0;       // 法线计算时的数字相加用变量
+
+	// 将重力的值代入，作为初始值。
+	float3 force = _Gravity.xyz;
+	// 1.0 / 質量
+	float  invMass = _InverseMass;
+	
+	// 如果是布的顶部，为了固定位置不计算
+	// 此处控制哪些部分保持不动
+	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
+	{
+		pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+
+		// 写入
+		_PositionBufferRW[idx.xy] = float4(pos.xyz, 1.0);
+		_PositionPrevBufferRW[idx.xy] = float4(posPrev.xyz, 1.0);
+		_NormalBufferRW[idx.xy] = float4(normal.xyz, 1.0);
+		return;
+	}
+
+	// 对附近的十二个分区进行计算
+	[unroll]//基于循环次数展开循环，需要gles3
+	for (int k = 0; k < 12; k++)
+	{
+		// 附近分区的ID(坐标)的偏移
+		int2 neighCoord = NextNeigh(k);
+		// 不计算X轴边缘的长度
+		if (((idx.x+neighCoord.x) < 0) || ((idx.x+neighCoord.x) > (res.x-1)))
+			continue;
+		// 不计算Y轴边缘的长度
+		if (((idx.y+neighCoord.y) < 0) || ((idx.y+neighCoord.y) > (res.y-1)))
+			continue;
+		// 邻居的ID
+		int2   idxNeigh = int2(idx.x + neighCoord.x, idx.y + neighCoord.y);
+		// 附近的分区的位置
+		float3 posNeigh = _PositionBufferRW[idxNeigh].xyz;
+		// 附近区域的位置之差
+		float3 posDiff = posNeigh - pos;
+
+		// 法線計算
+		// 从基点到附近的区间的方向矢量
+		float3 currDiff = normalize(posDiff);
+		if ((iters > 0.0) && (k < 8))
+		{
+			// 首先，如果我们之前研究过的邻域的方向矢量和现在的物体的角度是钝角， 1つ前に調べた近傍パーティクルとの方向ベクトルと
+			// 現在のものの角度が鈍角であれば
+			float a = dot(currDiff, lastDiff);
+			if (a > 0.0) {
+				// 通过外积得到直行的向量并相加
+				normal += cross(lastDiff, currDiff);
+			}
+		}
+		lastDiff = currDiff; // 保持，以便与下一个附近区间计算时使用。
+
+		// 计算相邻区间的弹簧的自然长度
+		float  restLength = length(neighCoord * _RestLength);
+		// 计算弹簧的力
+		force += (currDiff*(length(posDiff)-restLength))*_Stiffness-vel*_Damp;
+		// 加算
+		if (k < 8) iters += 1.0;
+	}
+	// 计算法线向量
+	normal = normalize(normal / -(iters - 1.0));
+
+	// 加速度
+	float3 acc = (float3)0.0;
+	// 运用运动定律（加速度的大小与力的大小成正比，与质量成反比）
+	acc = force * invMass;
+
+	// 贝莱法的位置计算
+	float3 tmp = pos;
+	pos = pos * 2.0 - posPrev + acc * (_TimeStep * _TimeStep);
+	posPrev = tmp; // 前一个时间步长的位置
+
+	// 计算碰撞
+	if (_EnableCollideSphere)
+	{
+		float3 center = _CollideSphereParams.xyz; // 中心位置
+		float  radius = _CollideSphereParams.w;   // 半径
+
+		if (length(pos - center) < radius)
+		{
+			// 计算从撞击球的中心到布的边缘位置的单位向量
+			float3 collDir = normalize(pos - center);
+			// 在撞击球的表面移动边缘位置
+			pos = center + collDir * radius;
+		}
+	}
+
+	// 写入
+	_PositionBufferRW[idx.xy]     = float4(pos.xyz,     1.0);
+	_PositionPrevBufferRW[idx.xy] = float4(posPrev.xyz, 1.0);
+	_NormalBufferRW[idx.xy]       = float4(normal.xyz,  1.0);
+}
