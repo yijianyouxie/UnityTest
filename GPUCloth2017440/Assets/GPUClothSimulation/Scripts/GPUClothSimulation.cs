@@ -27,8 +27,10 @@ namespace GPUClothSimulation
         [Header("References")]
         // 参照碰撞用球体的transform
         public Transform CollisionSphereTransform;
-        public Transform BodyTr;
-        private Vector3 BodyTrLastPos;
+        //把脖子物体放到碰撞球里去
+        //其实不用将脖子物体放到碰撞球里去，因为computeShader里计算时使用的也是碰撞球的世界坐标
+        public Transform NeckTr;
+        private Vector3 NeckTrLastPos;
 
         [Header("Resources")]
         // 用于计算的ComputeShader
@@ -87,14 +89,6 @@ namespace GPUClothSimulation
             ResetBuffer();
             // 初始化的标志设置为true
             IsInit = true;
-
-            if(null != BodyTr)
-            {
-                BodyTrLastPos = BodyTr.position;
-            }else
-            {
-                Debug.LogError("====BodyTr is null.");
-            }
 
             str += "Init true.\n";
         }
@@ -155,6 +149,17 @@ namespace GPUClothSimulation
             cs.SetTexture(kernelId, "_PositionBufferRW",     _posBuff[0]);
             cs.SetTexture(kernelId, "_PositionPrevBufferRW", _posPrevBuff[0]);
             cs.SetTexture(kernelId, "_NormalBufferRW",       _normBuff);
+
+            //初始化的时候将脖子的位置传递进去，改变buffer里的值
+            if (null != NeckTr)
+            {
+                var neckPos = NeckTr.position;
+                cs.SetFloats("_NeckPosition", new float[3] { neckPos.x, neckPos.y, neckPos.z });
+            }
+            else
+            {
+                Debug.LogError("====NeckTr is null.");
+            }
             // 运行内核
             cs.Dispatch(kernelId, groupThreadsX, groupThreadsY, 1);
             // 复制缓冲区
@@ -162,18 +167,6 @@ namespace GPUClothSimulation
             Graphics.Blit(_posPrevBuff[0], _posPrevBuff[1]);
 
             str += "ResetBuffer.\n";
-        }
-
-        void SetPifengRootPos()
-        {
-            if(null != BodyTr)
-            {
-                var pos = BodyTr.position - BodyTrLastPos;
-            }
-            else
-            {
-                Debug.LogError("====SetPifengRootPos, BodyTr is null.");
-            }
         }
 
         // 模拟
@@ -207,6 +200,7 @@ namespace GPUClothSimulation
                 float collisionSphereRad = 
                     CollisionSphereTransform.localScale.x * 0.5f + 0.01f;
                 cs.SetBool  ("_EnableCollideSphere", true);
+                //这里设定的是世界坐标系里的位置
                 cs.SetFloats("_CollideSphereParams", 
                     new float[4] {
                         collisionSpherePos.x,
@@ -217,6 +211,13 @@ namespace GPUClothSimulation
             }
             else
                 cs.SetBool("_EnableCollideSphere", false);
+
+            //设置脖子的位置信息
+            if (null != NeckTr)
+            {
+                var neckPos = NeckTr.position;
+                cs.SetFloats("_NeckPosition", new float[3] { neckPos.x, neckPos.y, neckPos.z });
+            }
 
             for (var i = 0; i < VerletIterationNum; i++)
             {           
@@ -364,6 +365,7 @@ namespace GPUClothSimulation
 
         private string computeSupport = "";
         private string str = "";
+        private bool hideLog = true;
         void DrawComputeSupport()
         {
             float textAreaWidth = 600f;
@@ -382,8 +384,19 @@ namespace GPUClothSimulation
                 ResetBuffer();
             }
 
-            //执行过程
-            str = GUI.TextArea(new Rect(0, 0, textAreaWidth, 800), str);
+            if(!hideLog && GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 270, 150, 50), "隐藏日志"))
+            {
+                hideLog = !hideLog;
+            }
+            if (hideLog && GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 270, 150, 50), "显示日志"))
+            {
+                hideLog = !hideLog;
+            }
+            if (!hideLog)
+            {
+                //执行过程
+                str = GUI.TextArea(new Rect(0, 0, textAreaWidth, 800), str);
+            }
             if (GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 210, 150, 50), "清空日志"))
             {
                 str = "";
