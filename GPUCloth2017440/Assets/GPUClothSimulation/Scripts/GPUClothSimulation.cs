@@ -423,16 +423,16 @@ namespace GPUClothSimulation
             //当前设备的GPU型号
             GUI.Label(new UnityEngine.Rect(textAreaWidth + 20, 60, 150, 50), "GPU：" + SystemInfo.graphicsDeviceName, titleStyle2);
 
-            if (GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 150, 150, 50), "重置RT"))
+            if (GUI.Button(new UnityEngine.Rect(Screen.width - 150, 150, 150, 50), "重置RT"))
             {
                 ResetBuffer();
             }
 
-            if(!hideLog && GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 270, 150, 50), "隐藏日志"))
+            if(!hideLog && GUI.Button(new UnityEngine.Rect(Screen.width - 150, 270, 150, 50), "隐藏日志"))
             {
                 hideLog = !hideLog;
             }
-            if (hideLog && GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 270, 150, 50), "显示日志"))
+            if (hideLog && GUI.Button(new UnityEngine.Rect(Screen.width - 150, 270, 150, 50), "显示日志"))
             {
                 hideLog = !hideLog;
             }
@@ -441,7 +441,7 @@ namespace GPUClothSimulation
                 //执行过程
                 str = GUI.TextArea(new Rect(0, 0, textAreaWidth, 800), str);
             }
-            if (GUI.Button(new UnityEngine.Rect(textAreaWidth + 20, 210, 150, 50), "清空日志"))
+            if (GUI.Button(new UnityEngine.Rect(Screen.width - 150, 210, 150, 50), "清空日志"))
             {
                 str = "";
             }
