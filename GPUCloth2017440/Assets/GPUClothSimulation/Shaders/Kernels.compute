@@ -31,6 +31,8 @@ bool   _EnableCollideSphere; // 是否进行碰撞处理的标志
 float4 _CollideSphereParams; // 碰撞处理参数(pos.xyz, radius)
 
 float3 _NeckPosition;//模拟脖子的位置
+float3 _NeckEndPosition;//模拟脖子圈结束的位置
+//RWStructuredBuffer<float3> _SpeedBuffer;
 
 // 邻近分区的ID偏移(x, y)的排列
 static const int2 m_Directions[12] =
@@ -67,9 +69,23 @@ void CSInit(uint3 DTid : SV_DispatchThreadID)
 	pos.xy -= _TotalClothLength.xy * 0.5;
 	// 法线
 	float3 nrm = float3(0, 0, -1);
+
+	float ratio = float(idx.x) / float(NUM_THREADS_XY);
 	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
 	{
-		pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+		//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x -  _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
+		pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
+					 _NeckPosition.y,
+					 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
+		//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+	}
+	else
+	{
+		//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), pos.y, _NeckPosition.z);
+		pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
+					 pos.y,
+					 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
+		//pos = float3(pos.x, pos.y, _NeckPosition.z);
 	}
 	// 写入缓冲区
 	_PositionPrevBufferRW[idx] = float4(pos.xyz, 1.0);
@@ -90,6 +106,7 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 	float3 posPrev = _PositionPrevBufferRO[idx.xy].xyz;
 	// 根据位置和前一个时间步的位置计算速度
 	float3 vel = (pos - posPrev) / _TimeStep;
+	//_SpeedBuffer[idx.x] = (pos - posPrev);
 
 	float3 normal   = (float3)0; // 法线
 	float3 lastDiff = (float3)0; // 法线计算时使用的方向矢量存储用变量
@@ -104,7 +121,12 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 	// 此处控制哪些部分保持不动
 	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
 	{
-		pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+		float ratio = float(idx.x) / float(NUM_THREADS_XY);
+		//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
+		pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
+				     _NeckPosition.y, 
+				     _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
+		//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
 
 		// 写入
 		_PositionBufferRW[idx.xy] = float4(pos.xyz, 1.0);
@@ -112,6 +134,12 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 		_NormalBufferRW[idx.xy] = float4(normal.xyz, 1.0);
 		return;
 	}
+	////根据速度修正
+	//if (abs(vel.x) > 20 || abs(vel.y) > 20 || abs(vel.z) > 20)
+	//{
+	//	vel = 5;
+	//	posPrev = pos;
+	//}
 
 	// 对附近的十二个分区进行计算
 	[unroll]//基于循环次数展开循环，需要gles3

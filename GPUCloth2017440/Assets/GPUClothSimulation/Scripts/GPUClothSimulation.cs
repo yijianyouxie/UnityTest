@@ -13,6 +13,9 @@ namespace GPUClothSimulation
         public int     VerletIterationNum = 4;
         // 布的分辨率
         public Vector2Int ClothResolution = new Vector2Int(128, 128);
+        private int[] ClothResolutionArr = new int[2];
+        private float[] totalClothLength = new float[2];
+        private float[] CollideSphereParams = new float[4];
         // 布上点的间隔（小弹簧的自然长度）
         public float   RestLength = 0.02f;
         // 决定布伸缩性的常数（弹簧的硬度）
@@ -29,8 +32,9 @@ namespace GPUClothSimulation
         public Transform CollisionSphereTransform;
         //把脖子物体放到碰撞球里去
         //其实不用将脖子物体放到碰撞球里去，因为computeShader里计算时使用的也是碰撞球的世界坐标
-        public Transform NeckTr;
-        private Vector3 NeckTrLastPos;
+        public Transform NeckBegainTr;
+        public Transform NeckEndTr;
+        private float[] _NeckPosition = new float[3];
 
         [Header("Resources")]
         // 用于计算的ComputeShader
@@ -54,6 +58,9 @@ namespace GPUClothSimulation
         
         // 是否初始化了模拟资源
         public bool IsInit { private set; get; }
+
+        //private ComputeBuffer speedBuffer;
+        //private Vector3[] speedArray;
 
         // 获取位置数据的缓冲区
         public RenderTexture GetPositionBuffer()
@@ -85,6 +92,9 @@ namespace GPUClothSimulation
             CreateRenderTexture(ref _posBuff,     w, h, format, filter);
             CreateRenderTexture(ref _posPrevBuff, w, h, format, filter);
             CreateRenderTexture(ref _normBuff,    w, h, format, filter);
+
+            //InitSpeedBuffer();
+
             // 重置模拟数据
             ResetBuffer();
             // 初始化的标志设置为true
@@ -124,6 +134,13 @@ namespace GPUClothSimulation
             DrawComputeSupport();
         }
         
+        //void InitSpeedBuffer()
+        //{
+        //    speedArray = new Vector3[1];
+        //    speedBuffer = new ComputeBuffer(1, 3*4);
+        //    speedBuffer.SetData(speedArray);
+        //}
+
         // 重置模拟用的数据
         void ResetBuffer()
         {
@@ -141,27 +158,42 @@ namespace GPUClothSimulation
                 RestLength * ClothResolution.y
             );
             // 设置参数，缓冲区
-            cs.SetInts  ("_ClothResolution", 
-                new int[2] { ClothResolution.x, ClothResolution.y });
-            cs.SetFloats("_TotalClothLength",
-                new float[2] { _totalClothLength.x, _totalClothLength.y });
+            ClothResolutionArr[0] = ClothResolution.x;
+            ClothResolutionArr[1] = ClothResolution.y;
+            cs.SetInts  ("_ClothResolution", ClothResolutionArr);
+            totalClothLength[0] = _totalClothLength.x;
+            totalClothLength[1] = _totalClothLength.y;
+            cs.SetFloats("_TotalClothLength", totalClothLength);
             cs.SetFloat ("_RestLength", RestLength);
             cs.SetTexture(kernelId, "_PositionBufferRW",     _posBuff[0]);
             cs.SetTexture(kernelId, "_PositionPrevBufferRW", _posPrevBuff[0]);
             cs.SetTexture(kernelId, "_NormalBufferRW",       _normBuff);
 
             //初始化的时候将脖子的位置传递进去，改变buffer里的值
-            if (null != NeckTr)
+            if (null != NeckBegainTr && null != NeckEndTr)
             {
-                var neckPos = NeckTr.position;
-                cs.SetFloats("_NeckPosition", new float[3] { neckPos.x, neckPos.y, neckPos.z });
+                var neckPos = NeckBegainTr.position;
+                var neckEndPos = NeckEndTr.position;
+                _NeckPosition[0] = neckPos.x;
+                _NeckPosition[1] = neckPos.y;
+                _NeckPosition[2] = neckPos.z;
+                cs.SetFloats("_NeckPosition", _NeckPosition);
+                _NeckPosition[0] = neckEndPos.x;
+                _NeckPosition[1] = neckEndPos.y;
+                _NeckPosition[2] = neckEndPos.z;
+                cs.SetFloats("_NeckEndPosition", _NeckPosition);
             }
             else
             {
                 Debug.LogError("====NeckTr is null.");
             }
+            //cs.SetBuffer(kernelId, "_SpeedBuffer", speedBuffer);
             // 运行内核
             cs.Dispatch(kernelId, groupThreadsX, groupThreadsY, 1);
+
+            //注意，获取数据很耗时
+            //speedBuffer.GetData(speedArray);
+
             // 复制缓冲区
             Graphics.Blit(_posBuff[0],     _posBuff[1]);
             Graphics.Blit(_posPrevBuff[0], _posPrevBuff[1]);
@@ -190,8 +222,7 @@ namespace GPUClothSimulation
             cs.SetFloat ("_InverseMass", (float)1.0f / Mass);
             cs.SetFloat ("_TimeStep", timestep);
             cs.SetFloat ("_RestLength", RestLength);
-            cs.SetInts  ("_ClothResolution", 
-                new int[2] { ClothResolution.x, ClothResolution.y });
+            cs.SetInts  ("_ClothResolution", ClothResolutionArr);
 
             // 设置碰撞球的参数
             if (CollisionSphereTransform != null)
@@ -201,22 +232,28 @@ namespace GPUClothSimulation
                     CollisionSphereTransform.localScale.x * 0.5f + 0.01f;
                 cs.SetBool  ("_EnableCollideSphere", true);
                 //这里设定的是世界坐标系里的位置
-                cs.SetFloats("_CollideSphereParams", 
-                    new float[4] {
-                        collisionSpherePos.x,
-                        collisionSpherePos.y,
-                        collisionSpherePos.z,
-                        collisionSphereRad
-                    });
+                CollideSphereParams[0] = collisionSpherePos.x;
+                CollideSphereParams[1] = collisionSpherePos.y;
+                CollideSphereParams[2] = collisionSpherePos.z;
+                CollideSphereParams[3] = collisionSphereRad;
+                cs.SetFloats("_CollideSphereParams", CollideSphereParams);
             }
             else
                 cs.SetBool("_EnableCollideSphere", false);
 
             //设置脖子的位置信息
-            if (null != NeckTr)
+            if (null != NeckBegainTr)
             {
-                var neckPos = NeckTr.position;
-                cs.SetFloats("_NeckPosition", new float[3] { neckPos.x, neckPos.y, neckPos.z });
+                var neckPos = NeckBegainTr.position;
+                var neckEndPos = NeckEndTr.position;
+                _NeckPosition[0] = neckPos.x;
+                _NeckPosition[1] = neckPos.y;
+                _NeckPosition[2] = neckPos.z;
+                cs.SetFloats("_NeckPosition", _NeckPosition);
+                _NeckPosition[0] = neckEndPos.x;
+                _NeckPosition[1] = neckEndPos.y;
+                _NeckPosition[2] = neckEndPos.z;
+                cs.SetFloats("_NeckEndPosition", _NeckPosition);
             }
 
             for (var i = 0; i < VerletIterationNum; i++)
@@ -228,8 +265,15 @@ namespace GPUClothSimulation
                 cs.SetTexture(kernelId, "_PositionPrevBufferRW", _posPrevBuff[1]);
 
                 cs.SetTexture(kernelId, "_NormalBufferRW",       _normBuff);
+
+                //cs.SetBuffer(kernelId, "_SpeedBuffer", speedBuffer);
+
                 // 执行线程
                 cs.Dispatch(kernelId, groupThreadsX, groupThreadsY, 1);
+
+                //speedBuffer.GetData(speedArray);
+                //Debug.LogError("====speedArray:" + speedArray[0] + "-len:" + speedArray.Length);
+
                 // 替换读入缓存器和写入缓存器
                 SwapBuffer(ref _posBuff[0],     ref _posBuff[1]    );
                 SwapBuffer(ref _posPrevBuff[0], ref _posPrevBuff[1]);
