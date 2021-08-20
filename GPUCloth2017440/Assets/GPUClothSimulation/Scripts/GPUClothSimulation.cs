@@ -1,5 +1,8 @@
 ﻿using System;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace GPUClothSimulation
 {
@@ -55,6 +58,8 @@ namespace GPUClothSimulation
         public bool EnableDebugOnGUI = true;
         // 调试显示时缓冲区的显示比例
         public float _debugOnGUIScale = 1.0f;
+
+        public GameObject Sphere;
         
         // 是否初始化了模拟资源
         public bool IsInit { private set; get; }
@@ -83,10 +88,16 @@ namespace GPUClothSimulation
         
         void Start()
         {
+#if UNITY_EDITOR
+            if (Application.isEditor)
+            {
+                EditorApplication.ExecuteMenuItem("Edit/Graphics Emulation/No Emulation");
+            }
+#endif
             var w = ClothResolution.x;
             var h = ClothResolution.y;
             var format = RenderTextureFormat.ARGBFloat;
-            //var format = RenderTextureFormat.ARGB32;
+            //var format = RenderTextureFormat.ARGB64;
             var filter = FilterMode.Point; // 过滤模式为点差值，避免像素之间的插值
             // 创建RT
             CreateRenderTexture(ref _posBuff,     w, h, format, filter);
@@ -440,6 +451,10 @@ namespace GPUClothSimulation
             {
                 //执行过程
                 str = GUI.TextArea(new Rect(0, 0, textAreaWidth, 800), str);
+            }
+            if(GUI.Button(new UnityEngine.Rect(Screen.width - 150, 330, 150, 50), "控制球体"))
+            {
+                Sphere.SetActive(!Sphere.activeInHierarchy);
             }
             if (GUI.Button(new UnityEngine.Rect(Screen.width - 150, 210, 150, 50), "清空日志"))
             {

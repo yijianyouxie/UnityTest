@@ -20,8 +20,9 @@ public class DragFollow : MonoBehaviour {
 
         if (isMove)
         {
-            Vector3 m_MousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 5);
+            Vector3 m_MousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, 5.0f);
             Vector3 pos = Camera.main.ScreenToWorldPoint(m_MousePos);
+            //pos.z = 0f;
             tr.position = pos;
         }
     }
