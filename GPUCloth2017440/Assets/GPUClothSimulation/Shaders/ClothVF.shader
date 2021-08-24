@@ -37,6 +37,7 @@
 			float4 _PositionTex_ST;
 			sampler2D _NormalTex;
 			float4 _NormalTex_ST;
+			float _NormalScale;
 			
 			v2f vert (appdata_tan v)
 			{
@@ -59,8 +60,10 @@
 				fixed4 col = tex2D(_MainTex, i.uv);
 
 				float3 tangentNormal = UnpackNormal(tex2D(_NormalTex, i.uv));
+				tangentNormal.xy = tangentNormal.xy * _NormalScale;
 				float3 tangentLightDir = normalize(i.lightDir);
-				fixed3 lambert = 0.5 * dot(tangentNormal, tangentLightDir) + 0.5;
+				//fixed3 lambert = 0.5 * dot(tangentNormal, tangentLightDir) + 0.5;
+				fixed3 lambert = max(0, dot(tangentNormal, tangentLightDir));
 				fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz;
 				fixed3 diffuse = lambert * _Color.xyz * _LightColor0.xyz + ambient*_Color.xyz;
 

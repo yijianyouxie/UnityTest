@@ -60,7 +60,11 @@ namespace GPUClothSimulation
         public float _debugOnGUIScale = 1.0f;
 
         public GameObject Sphere;
-        
+
+        private bool setPosition = true;
+        public int maxCount = 3;
+        private int count = 0;
+
         // 是否初始化了模拟资源
         public bool IsInit { private set; get; }
 
@@ -123,6 +127,11 @@ namespace GPUClothSimulation
             ////模拟前设定披风根部的位置
             //SetPifengRootPos();
 
+            if(count > maxCount)
+            {
+                return;
+            }
+            count++;
             // 进行模拟
             Simulation();
         }
@@ -183,6 +192,8 @@ namespace GPUClothSimulation
             //初始化的时候将脖子的位置传递进去，改变buffer里的值
             if (null != NeckBegainTr && null != NeckEndTr)
             {
+                cs.SetBool("_SetPosition", setPosition);
+
                 var neckPos = NeckBegainTr.position;
                 var neckEndPos = NeckEndTr.position;
                 _NeckPosition[0] = neckPos.x;
@@ -255,6 +266,8 @@ namespace GPUClothSimulation
             //设置脖子的位置信息
             if (null != NeckBegainTr)
             {
+                cs.SetBool("_SetPosition", setPosition);
+
                 var neckPos = NeckBegainTr.position;
                 var neckEndPos = NeckEndTr.position;
                 _NeckPosition[0] = neckPos.x;
@@ -436,6 +449,7 @@ namespace GPUClothSimulation
 
             if (GUI.Button(new UnityEngine.Rect(Screen.width - 150, 150, 150, 50), "重置RT"))
             {
+                count = 0;
                 ResetBuffer();
             }
 
@@ -459,6 +473,16 @@ namespace GPUClothSimulation
             if (GUI.Button(new UnityEngine.Rect(Screen.width - 150, 210, 150, 50), "清空日志"))
             {
                 str = "";
+            }
+
+            GUI.Label(new UnityEngine.Rect(Screen.width - 165, 405, 150, 50), VerletIterationNum.ToString());
+            VerletIterationNum = (int)GUI.HorizontalSlider(new UnityEngine.Rect(Screen.width - 150, 410, 150, 50), VerletIterationNum, 1, 16);
+
+            //设置位置
+            if(GUI.Button(new Rect(Screen.width - 150, 500, 150, 50), "设置位置"+ setPosition))
+            {
+                setPosition = !setPosition;
+
             }
         }
         public static string GetGraphicsDeviceType()

@@ -32,6 +32,7 @@ float4 _CollideSphereParams; // 碰撞处理参数(pos.xyz, radius)
 
 float3 _NeckPosition;//模拟脖子的位置
 float3 _NeckEndPosition;//模拟脖子圈结束的位置
+bool   _SetPosition;//是否设置位置跟随
 //RWStructuredBuffer<float3> _SpeedBuffer;
 
 // 邻近分区的ID偏移(x, y)的排列
@@ -65,28 +66,32 @@ void CSInit(uint3 DTid : SV_DispatchThreadID)
 
 	// 位置(设定每个小节点的位置，索引是从0-64.组是2，每个组里是32)
 	float3 pos = float3(idx.x * _RestLength, idx.y * _RestLength, 0);
-	//设置小节点的偏移
-	pos.xy -= _TotalClothLength.xy * 0.5;
+	////设置小节点的偏移
+	//pos.xy -= _TotalClothLength.xy * 0.5;
 	// 法线
 	float3 nrm = float3(0, 0, -1);
 
-	float ratio = float(idx.x) / float(NUM_THREADS_XY);
-	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
+	if (_SetPosition)
 	{
-		//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x -  _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
-		pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
-					 _NeckPosition.y,
-					 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
-		//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+		float ratio = float(idx.x) / float(NUM_THREADS_XY);
+		if (idx.y >= _ClothResolution.y - ANCHORSIZE)
+		{
+			//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x -  _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
+			pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
+						 _NeckPosition.y + pos.y,
+						 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
+			//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+		}
+		else
+		{
+			//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), pos.y, _NeckPosition.z);
+			pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
+					     _NeckPosition.y + pos.y,
+						 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
+			//pos = float3(pos.x, pos.y, _NeckPosition.z);
+		}
 	}
-	else
-	{
-		//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), pos.y, _NeckPosition.z);
-		pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
-					 pos.y,
-					 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
-		//pos = float3(pos.x, pos.y, _NeckPosition.z);
-	}
+
 	// 写入缓冲区
 	_PositionPrevBufferRW[idx] = float4(pos.xyz, 1.0);
 	_PositionBufferRW[idx]     = float4(pos.xyz, 1.0);
@@ -121,17 +126,20 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 	// 此处控制哪些部分保持不动
 	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
 	{
-		float ratio = float(idx.x) / float(NUM_THREADS_XY);
-		//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
-		pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
-				     _NeckPosition.y, 
-				     _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
-		//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+		if (_SetPosition)
+		{
+			float ratio = float(idx.x) / float(NUM_THREADS_XY);
+			//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
+			pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
+					     _NeckPosition.y + idx.y * _RestLength,
+						 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
+			//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
 
-		// 写入
-		_PositionBufferRW[idx.xy] = float4(pos.xyz, 1.0);
-		_PositionPrevBufferRW[idx.xy] = float4(posPrev.xyz, 1.0);
-		_NormalBufferRW[idx.xy] = float4(normal.xyz, 1.0);
+			// 写入
+			_PositionBufferRW[idx.xy] = float4(pos.xyz, 1.0);
+			_PositionPrevBufferRW[idx.xy] = float4(posPrev.xyz, 1.0);
+			_NormalBufferRW[idx.xy] = float4(normal.xyz, 1.0);
+		}
 		return;
 	}
 	////根据速度修正

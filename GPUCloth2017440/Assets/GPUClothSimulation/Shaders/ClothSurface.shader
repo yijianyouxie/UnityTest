@@ -1,4 +1,4 @@
-﻿Shader "Hidden/GPUClothSimulation/ClothSurface"
+﻿Shader "GPUClothSimulation/ClothSurface"
 {
     Properties
     {
