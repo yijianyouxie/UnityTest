@@ -32,6 +32,8 @@ float4 _CollideSphereParams; // 碰撞处理参数(pos.xyz, radius)
 
 float3 _NeckPosition;//模拟脖子的位置
 float3 _NeckEndPosition;//模拟脖子圈结束的位置
+#define NeckPointCount 4 // 锚定固定不变的部分的大小
+float4 _NeckVectorArray[NeckPointCount];//模拟脖子的圆圈位置
 bool   _SetPosition;//是否设置位置跟随
 //RWStructuredBuffer<float3> _SpeedBuffer;
 
@@ -61,10 +63,11 @@ int2 NextNeigh(int n)
 [numthreads(NUM_THREADS_XY, NUM_THREADS_XY, 1)]
 void CSInit(uint3 DTid : SV_DispatchThreadID)
 {
-	//在这里进行了初始RT的顶点位置信息模拟，都是从0开始的
+	//在这里进行了初始RT的顶点位置信息模拟，都是从0开始的.
+	//注意此处idx.x的值是从【0-63】
 	uint2 idx = DTid.xy;
 
-	// 位置(设定每个小节点的位置，索引是从0-64.组是2，每个组里是32)
+	// 位置(设定每个小节点的位置，索引是从0-63.组是2，每个组里是32)
 	float3 pos = float3(idx.x * _RestLength, idx.y * _RestLength, 0);
 	////设置小节点的偏移
 	//pos.xy -= _TotalClothLength.xy * 0.5;
@@ -73,23 +76,18 @@ void CSInit(uint3 DTid : SV_DispatchThreadID)
 
 	if (_SetPosition)
 	{
-		float ratio = float(idx.x) / float(NUM_THREADS_XY);
-		if (idx.y >= _ClothResolution.y - ANCHORSIZE)
-		{
-			//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x -  _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
-			pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
-						 _NeckPosition.y + pos.y,
-						 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
-			//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
-		}
-		else
-		{
-			//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), pos.y, _NeckPosition.z);
-			pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
-					     _NeckPosition.y + pos.y,
-						 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
-			//pos = float3(pos.x, pos.y, _NeckPosition.z);
-		}
+		//因为idx.x的最大值是64，外部传过来的组是2；所以乘以2
+		float index = (float(idx.x) / (float(NUM_THREADS_XY*2) / float(NeckPointCount - 1.0)));
+		index = int( floor(index));
+		//index = 0;
+		float ratio = float(idx.x) / float(NUM_THREADS_XY*2);
+		//注意，此处的单位因子是按照总开始和总结尾得出的。所以ratio的值也应该是总的一个比例。
+		//ratio = 1.0 / float(NUM_THREADS_XY*2 - 1) * (float(idx.x)/* - float(index-2) * (float(NUM_THREADS_XY*2) / float(NeckPointCount - 1))*/);
+		float4 trPos1 = _NeckVectorArray[index];
+		float4 trPos2 = _NeckVectorArray[index + 1];
+		pos = float3(trPos1.x + ratio*(trPos2.x - trPos1.x),
+			trPos1.y + idx.y * _RestLength,
+			trPos1.z + ratio*(trPos2.z - trPos1.z));
 	}
 
 	// 写入缓冲区
@@ -127,13 +125,18 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 	if (idx.y >= _ClothResolution.y - ANCHORSIZE)
 	{
 		if (_SetPosition)
-		{
-			float ratio = float(idx.x) / float(NUM_THREADS_XY);
-			//pos = float3(_NeckPosition.x + (float(idx.x) / float(NUM_THREADS_XY))*(_NeckEndPosition.x - _NeckPosition.x), _NeckPosition.y, _NeckPosition.z);
-			pos = float3(_NeckPosition.x + ratio*(_NeckEndPosition.x - _NeckPosition.x),
-					     _NeckPosition.y + idx.y * _RestLength,
-						 _NeckPosition.z + ratio*(_NeckEndPosition.z - _NeckPosition.z));
-			//pos = float3(pos.x, _NeckPosition.y, _NeckPosition.z);
+		{			
+			//因为idx.x的最大值是64，外部传过来的组是2；所以乘以2
+			float index = (float(idx.x) / (float(NUM_THREADS_XY * 2) / float(NeckPointCount - 1.0)));
+			index = int(floor(index));
+			float ratio = float(idx.x) / float(NUM_THREADS_XY * 2);
+			//注意，此处的单位因子是按照总开始和总结尾得出的。所以ratio的值也应该是总的一个比例。
+			//ratio = 1.0 / float(NUM_THREADS_XY*2 - 1) * (float(idx.x)/* - float(index-2) * (float(NUM_THREADS_XY*2) / float(NeckPointCount - 1))*/);
+			float4 trPos1 = _NeckVectorArray[index];
+			float4 trPos2 = _NeckVectorArray[index + 1];
+			pos = float3(trPos1.x + ratio*(trPos2.x - trPos1.x),
+				trPos1.y + idx.y * _RestLength,
+				trPos1.z + ratio*(trPos2.z - trPos1.z));
 
 			// 写入
 			_PositionBufferRW[idx.xy] = float4(pos.xyz, 1.0);

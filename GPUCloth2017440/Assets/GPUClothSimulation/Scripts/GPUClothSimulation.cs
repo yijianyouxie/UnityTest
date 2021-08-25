@@ -71,6 +71,12 @@ namespace GPUClothSimulation
         //private ComputeBuffer speedBuffer;
         //private Vector3[] speedArray;
 
+        //模拟脖子的圆圈
+        public Transform PointsRootTr;//项链母体
+        private const int neckPointCount = 4;
+        private Transform[] neckTrs = new Transform[neckPointCount];
+        private Vector4[] neckVectorArray = new Vector4[neckPointCount];
+
         // 获取位置数据的缓冲区
         public RenderTexture GetPositionBuffer()
         {
@@ -101,7 +107,9 @@ namespace GPUClothSimulation
             var w = ClothResolution.x;
             var h = ClothResolution.y;
             var format = RenderTextureFormat.ARGBFloat;
-            //var format = RenderTextureFormat.ARGB64;
+            //新发现，貌似不同的RT格式下，通道中的值并不是1就代表了是红，里边只是存储的这个值。
+            //例如ARGBFloat在computeShader中设置了2才代表的是最红；而如果设置为ARGB32，不管设置多大的值都是红的一半。
+            //var format = RenderTextureFormat.ARGB32;
             var filter = FilterMode.Point; // 过滤模式为点差值，避免像素之间的插值
             // 创建RT
             CreateRenderTexture(ref _posBuff,     w, h, format, filter);
@@ -109,7 +117,7 @@ namespace GPUClothSimulation
             CreateRenderTexture(ref _normBuff,    w, h, format, filter);
 
             //InitSpeedBuffer();
-
+            InitNeckPosData();
             // 重置模拟数据
             ResetBuffer();
             // 初始化的标志设置为true
@@ -160,7 +168,25 @@ namespace GPUClothSimulation
         //    speedBuffer = new ComputeBuffer(1, 3*4);
         //    speedBuffer.SetData(speedArray);
         //}
+        private void InitNeckPosData()
+        {
+            if(null == PointsRootTr)
+            {
+                Debug.LogError("====请设置项链。");
+                return;
+            }
 
+            var chCount = PointsRootTr.childCount;
+            if(chCount < neckPointCount)
+            {
+                Debug.LogError("====脖子基准点数目过少。");
+            }
+            for(int i = 0;i < chCount;i++)
+            {
+                var tr = PointsRootTr.GetChild(i);
+                neckTrs[i] = tr;
+            }
+        }
         // 重置模拟用的数据
         void ResetBuffer()
         {
@@ -193,6 +219,15 @@ namespace GPUClothSimulation
             if (null != NeckBegainTr && null != NeckEndTr)
             {
                 cs.SetBool("_SetPosition", setPosition);
+
+                for(int i = 0;i < neckPointCount;i++)
+                {
+                    neckVectorArray[i].x = neckTrs[i].position.x;
+                    neckVectorArray[i].y = neckTrs[i].position.y;
+                    neckVectorArray[i].z = neckTrs[i].position.z;
+                    neckVectorArray[i].w = 0;
+                }
+                cs.SetVectorArray("_NeckVectorArray", neckVectorArray);
 
                 var neckPos = NeckBegainTr.position;
                 var neckEndPos = NeckEndTr.position;
@@ -267,6 +302,14 @@ namespace GPUClothSimulation
             if (null != NeckBegainTr)
             {
                 cs.SetBool("_SetPosition", setPosition);
+                for (int i = 0; i < neckPointCount; i++)
+                {
+                    neckVectorArray[i].x = neckTrs[i].position.x;
+                    neckVectorArray[i].y = neckTrs[i].position.y;
+                    neckVectorArray[i].z = neckTrs[i].position.z;
+                    neckVectorArray[i].w = 0;
+                }
+                cs.SetVectorArray("_NeckVectorArray", neckVectorArray);
 
                 var neckPos = NeckBegainTr.position;
                 var neckEndPos = NeckEndTr.position;
