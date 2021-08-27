@@ -228,17 +228,6 @@ namespace GPUClothSimulation
                     neckVectorArray[i].w = 0;
                 }
                 cs.SetVectorArray("_NeckVectorArray", neckVectorArray);
-
-                var neckPos = NeckBegainTr.position;
-                var neckEndPos = NeckEndTr.position;
-                _NeckPosition[0] = neckPos.x;
-                _NeckPosition[1] = neckPos.y;
-                _NeckPosition[2] = neckPos.z;
-                cs.SetFloats("_NeckPosition", _NeckPosition);
-                _NeckPosition[0] = neckEndPos.x;
-                _NeckPosition[1] = neckEndPos.y;
-                _NeckPosition[2] = neckEndPos.z;
-                cs.SetFloats("_NeckEndPosition", _NeckPosition);
             }
             else
             {
@@ -310,17 +299,6 @@ namespace GPUClothSimulation
                     neckVectorArray[i].w = 0;
                 }
                 cs.SetVectorArray("_NeckVectorArray", neckVectorArray);
-
-                var neckPos = NeckBegainTr.position;
-                var neckEndPos = NeckEndTr.position;
-                _NeckPosition[0] = neckPos.x;
-                _NeckPosition[1] = neckPos.y;
-                _NeckPosition[2] = neckPos.z;
-                cs.SetFloats("_NeckPosition", _NeckPosition);
-                _NeckPosition[0] = neckEndPos.x;
-                _NeckPosition[1] = neckEndPos.y;
-                _NeckPosition[2] = neckEndPos.z;
-                cs.SetFloats("_NeckEndPosition", _NeckPosition);
             }
 
             for (var i = 0; i < VerletIterationNum; i++)
