@@ -79,10 +79,8 @@ void CSInit(uint3 DTid : SV_DispatchThreadID)
 		//因为idx.x的最大值是64，外部传过来的组是2；所以乘以2
 		float index = (float(idx.x) / (float(NUM_THREADS_XY*2) / float(NeckPointCount - 1.0)));
 		index = int( floor(index));
-		//index = 0;
-		float ratio = float(idx.x) / float(NUM_THREADS_XY*2);
-		//注意，此处的单位因子是按照总开始和总结尾得出的。所以ratio的值也应该是总的一个比例。
-		//ratio = 1.0 / float(NUM_THREADS_XY*2 - 1) * (float(idx.x)/* - float(index-2) * (float(NUM_THREADS_XY*2) / float(NeckPointCount - 1))*/);
+		//当前的减去前面总共的再除以这一段总的个数
+		float ratio = float(idx.x - index*(float(NUM_THREADS_XY * 2) / float(NeckPointCount - 1.0))) / (float(NUM_THREADS_XY * 2) / float(NeckPointCount - 1.0));
 		float4 trPos1 = _NeckVectorArray[index];
 		float4 trPos2 = _NeckVectorArray[index + 1];
 		pos = float3(trPos1.x + ratio*(trPos2.x - trPos1.x),
@@ -129,9 +127,8 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 			//因为idx.x的最大值是64，外部传过来的组是2；所以乘以2
 			float index = (float(idx.x) / (float(NUM_THREADS_XY * 2) / float(NeckPointCount - 1.0)));
 			index = int(floor(index));
-			float ratio = float(idx.x) / float(NUM_THREADS_XY * 2);
-			//注意，此处的单位因子是按照总开始和总结尾得出的。所以ratio的值也应该是总的一个比例。
-			//ratio = 1.0 / float(NUM_THREADS_XY*2 - 1) * (float(idx.x)/* - float(index-2) * (float(NUM_THREADS_XY*2) / float(NeckPointCount - 1))*/);
+			//当前的减去前面总共的再除以这一段总的个数
+			float ratio = float(idx.x - index*(float(NUM_THREADS_XY * 2) / float(NeckPointCount - 1.0))) / (float(NUM_THREADS_XY * 2) / float(NeckPointCount - 1.0));
 			float4 trPos1 = _NeckVectorArray[index];
 			float4 trPos2 = _NeckVectorArray[index + 1];
 			pos = float3(trPos1.x + ratio*(trPos2.x - trPos1.x),
