@@ -77,6 +77,13 @@ namespace GPUClothSimulation
         private Transform[] neckTrs = new Transform[neckPointCount];
         private Vector4[] neckVectorArray = new Vector4[neckPointCount];
 
+        //贝塞尔曲线
+        private const int ControlPointsNum = 5;
+        public Transform ControlTrParent;
+        private Transform[] ControlTrs = new Transform[ControlPointsNum];
+        private Vector4[] ControlPoints = new Vector4[ControlPointsNum];
+        private ComputeBuffer controlPointBuffer;// = new ComputeBuffer(ControlPointsNum, sizeof(float) * 4);
+
         // 获取位置数据的缓冲区
         public RenderTexture GetPositionBuffer()
         {
@@ -118,6 +125,7 @@ namespace GPUClothSimulation
 
             //InitSpeedBuffer();
             InitNeckPosData();
+            InitBezirePosData();
             // 重置模拟数据
             ResetBuffer();
             // 初始化的标志设置为true
@@ -187,6 +195,25 @@ namespace GPUClothSimulation
                 neckTrs[i] = tr;
             }
         }
+        private void InitBezirePosData()
+        {
+            if(null == ControlTrParent)
+            {
+                Debug.LogError("====ControlTrParent is null.");
+                return;
+            }
+            var chCount = ControlTrParent.childCount;
+            if(chCount < ControlPointsNum)
+            {
+                Debug.LogError("====chCount < ControlPointsNum");
+                return;
+            }
+            for(int i = 0;i < chCount;i++)
+            {
+                var tr = ControlTrParent.GetChild(i);
+                ControlTrs[i] = tr;
+            }
+        }
         // 重置模拟用的数据
         void ResetBuffer()
         {
@@ -233,9 +260,40 @@ namespace GPUClothSimulation
             {
                 Debug.LogError("====NeckTr is null.");
             }
+
+            //贝塞尔曲线
+            for(int i = 0;i < ControlPointsNum;i++)
+            {
+                ControlPoints[i].x = ControlTrs[i].position.x;
+                ControlPoints[i].y = ControlTrs[i].position.y;
+                ControlPoints[i].z = ControlTrs[i].position.z;
+                ControlPoints[i].w = 0f;
+            }
+            //ComputeBuffer nodePointBuffer = new ComputeBuffer(100, sizeof(float) * 3);
+            //ComputeBuffer controlPointBuffer = new ComputeBuffer(ControlPoints.Length, sizeof(float) * 4);
+            if(null == controlPointBuffer)
+            {
+                controlPointBuffer = new ComputeBuffer(ControlPointsNum, sizeof(float) * 4);
+            }
+            controlPointBuffer.SetData(ControlPoints);
+            cs.SetBuffer(kernelId, "ControlPoints", controlPointBuffer);
+            //cs.SetBuffer(kernelId, "NodePoints", nodePointBuffer);
+            //cs.SetVectorArray("ControlPoints", ControlPoints);
+            cs.SetInt("ControlPointAmount", ControlPointsNum);
+            cs.SetInt("NodeAmount", ClothResolution.x);
+
             //cs.SetBuffer(kernelId, "_SpeedBuffer", speedBuffer);
             // 运行内核
             cs.Dispatch(kernelId, groupThreadsX, groupThreadsY, 1);
+
+            //var nodePoints = new Vector3[100];
+            //nodePointBuffer.GetData(nodePoints);
+            //for (int i = 0; i < 100; i++)
+            //{
+            //    //Gizmos.color = color;
+            //    //Gizmos.DrawSphere(nodePoints[i], 0.2f);
+            //    Debug.LogError("====" + nodePoints[i]);
+            //}
 
             //注意，获取数据很耗时
             //speedBuffer.GetData(speedArray);
@@ -300,6 +358,29 @@ namespace GPUClothSimulation
                 }
                 cs.SetVectorArray("_NeckVectorArray", neckVectorArray);
             }
+
+            //贝塞尔曲线
+            for (int i = 0; i < ControlPointsNum; i++)
+            {
+                if(null == ControlTrs)
+                {
+                    Debug.LogError("====:null == ControlTrs");
+                    continue;
+                }
+                ControlPoints[i].x = ControlTrs[i].position.x;
+                ControlPoints[i].y = ControlTrs[i].position.y;
+                ControlPoints[i].z = ControlTrs[i].position.z;
+                ControlPoints[i].w = 0f;
+            }
+
+            //ComputeBuffer nodePointBuffer = new ComputeBuffer(100, sizeof(float) * 3);
+            //ComputeBuffer controlPointBuffer = new ComputeBuffer(ControlPoints.Length, sizeof(float) * 4);
+            controlPointBuffer.SetData(ControlPoints);
+            cs.SetBuffer(kernelId, "ControlPoints", controlPointBuffer);
+            //cs.SetBuffer(kernelId, "NodePoints", nodePointBuffer);
+            //cs.SetVectorArray("ControlPoints", ControlPoints);
+            cs.SetInt("ControlPointAmount", ControlPointsNum);
+            cs.SetInt("NodeAmount", ClothResolution.x);
 
             for (var i = 0; i < VerletIterationNum; i++)
             {           
