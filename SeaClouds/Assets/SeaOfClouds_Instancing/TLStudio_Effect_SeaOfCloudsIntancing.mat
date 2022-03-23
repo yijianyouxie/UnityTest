@@ -23,12 +23,12 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _CloudDensity: 0.84
-    - _CloudPower: 1.85
+    - _CloudDensity: 0.9
+    - _CloudPower: 1.58
     - _FogIntensity: 1
     - _InvFade: 0.11
     - _dither: 0.1
-    - _tiling: 0.2
+    - _tiling: 0.37
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DownColor: {r: 0.66619813, g: 0.89705884, b: 0.89705884, a: 1}

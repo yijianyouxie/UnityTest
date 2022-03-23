@@ -2,6 +2,7 @@
 {
     Properties
     {
+		_MainTex("MainTex", 2D) = "white" {}
         [HDR]_Color("Color", Color) = (1, 1, 1, 1)
         _DownColor("Down Color",color) = (1, 1, 1, 1)
         _3DNoise("3D Noise", 3D) = "white" {}
@@ -42,6 +43,7 @@
                 float3 normal : NORMAL;
 				float4 tangent : TANGENT;
                 float4 color : COLOR;
+				float3 uv: TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
@@ -91,8 +93,8 @@
 
                 
 
-                o.uv1 = v.vertex.xyz * _tiling * 0.1  + float3(_Time.y * 0.01,0,0);
-				o.uv2 = v.vertex.xyz * _tiling * 0.05 + float3(_Time.y * 0.02,0,0);
+				o.uv1 = v.uv  + float3(_Time.y * 0.001, 0.05, 0);
+				o.uv2 = v.uv  + float3(_Time.y * 0.01,0,0);
                 v.vertex.xyz += UNITY_ACCESS_INSTANCED_PROP(Props, _offset) * v.normal;
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 //o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));
@@ -145,11 +147,11 @@
 					i.color.a *= fade;
 				#endif
 
-				fixed4 col3 = tex3D(_3DNoise, i.uv2);
+				fixed4 col3 = tex2D(_MainTex, i.uv2.xy);
 				//return col3;
 
-                fixed4 col  = tex3D(_3DNoise, i.uv1 + col3.b * 0.2);
-				fixed4 col2 = tex3D(_3DNoise, i.uv2);
+                fixed4 col  = tex2D(_MainTex, i.uv1 + col3.b * 0.2);
+				fixed4 col2 = tex2D(_MainTex, i.uv2);
 
                 col.rgb = col.rrr + col2.ggg;
 
