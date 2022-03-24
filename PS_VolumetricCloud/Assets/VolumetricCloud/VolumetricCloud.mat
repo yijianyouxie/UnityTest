@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: VolumetricCloud
+  m_Shader: {fileID: 4800000, guid: 7d5e22f3a0648314c86a1b58c9c3fe5d, type: 3}
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _CIRCLE _IN_CLOUD _OPTIMIZATION_VERSION _RENDER_STATE_2
+    _REVERSE_V
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - BaseMap:
+        m_Texture: {fileID: 11700000, guid: bd463628d91e4374398834f1b9b11c78, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - NoiseMap:
+        m_Texture: {fileID: 11700000, guid: 3525b0cdc1671dc4f8b24c8f4ed3dabd, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - NoiseIntensity: 27
+    - NoiseTilling: 0.00698
+    - SampleCount: 40
+    - SoftEdge: 0.0039199996
+    - glossIntensity: 1.91
+    - mainLightIntensity: 0.981
+    m_Colors:
+    - BaseTilling: {r: 0.0014, g: 0.017, b: 0.0014, a: 0}
+    - CloudColor: {r: 1, g: 1, b: 1, a: 1}
+    - Condition: {r: 100, g: 175.16528, b: 0, a: 533}
+    - Density: {r: 0.002, g: 1, b: 0, a: 0}
+    - HGParameter: {r: 0.015119723, g: 1.81, b: 1.8, a: 0}
+    - MainLightColor: {r: 1, g: 0, b: 0, a: 1}
+    - Parameter1: {r: 0.0000463, g: 0.0001083, b: 0.0002643, a: 0}
+    - Parameter2: {r: 0.0000154, g: 0.0000234, b: 0.000036, a: 108.66672}
+    - Parameter3: {r: 0.002, g: 0.004, b: 0, a: 0}
+    - Parameter4: {r: 0.3333333, g: 0.0003333, b: 3, a: 0.01}
+    - Radius: {r: 1000, g: 1000, b: 0, a: 0}
+    - Speed: {r: -411011.66, g: -411011.66, b: -205505.83, a: -205505.83}

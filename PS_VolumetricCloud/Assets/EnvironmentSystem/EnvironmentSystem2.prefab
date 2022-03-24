@@ -1,0 +1,165 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 1720245379001306}
+  m_IsPrefabParent: 1
+--- !u!1 &1720245379001306
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 4013389326577614}
+  - component: {fileID: 114236785264751768}
+  - component: {fileID: 182929818112630808}
+  m_Layer: 0
+  m_Name: EnvironmentSystem2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4013389326577614
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1720245379001306}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &114236785264751768
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1720245379001306}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5b12d3f882c2a9428eafe968f158e5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableVolumetricCloud: 1
+  VolumetricCloudGO: {fileID: 0}
+  VolumetricCloudGOLow: {fileID: 0}
+  CloudMainLightColor: {r: 1, g: 0, b: 0, a: 1}
+  CloudColor: {r: 1, g: 1, b: 1, a: 1}
+  CloudMainLightDirection: {x: 38.2, y: -42.8, z: -356.9}
+  SampleCount: 40
+  CloudTilling: {x: 0.14, y: 1.7, z: 0.14}
+  Radius: 1000
+  CloudHeight: 634
+  MaxTop: 1500
+  CurrentTop: 200
+  MaxBottom: -200
+  CurrentBottom: -100
+  Speed: 6.27
+  Density: 2
+  MainLightIntensity: 0.981
+  glossyIntensity: 1.91
+  NoiseTilling: 0.698
+  NoiseIntensity: 2.7
+  SoftEdge: 0.392
+  Border: 0.807
+  VolumetricCloudBaseHeight: 0
+  AtmosphereColorSaturateDistance: 6294
+  AtmosphereColor: {r: 1, g: 0.941785, b: 0.6985294, a: 1}
+  emissionIntensity: 0
+  globalAOScale: 1
+  globalAOIntensity: 1
+  mainLightSpecularIntensity: 1
+  mainLightSpecularDirection: 50
+  mainLightSpecularDirectionY: 330
+  mainLightDiffuseAO: 5
+  globalCubemap: {fileID: 0}
+  exposureFX: 0
+  GlobalLightColor: {r: 1, g: 1, b: 1, a: 1}
+  GlobalLeafAOIntensity: 0
+  GlobalHLODLightIntensity: 1
+  snowDay: 0
+  snowHeight: -10
+  snowCoverage: 0
+  snowColor: {r: 0.3, g: 0.3, b: 0.3, a: 1}
+  SnowCameraSet: {x: 0, y: 0, z: 0}
+  SnowTexConfig: 0
+  SnowNoise: {fileID: 0}
+  SnowDepthTex: {fileID: 0}
+  SnowTerrainConfigA: {x: 0, y: 0, z: 0, w: 0}
+  SnowTerrainConfigB: {x: 0, y: 0, z: 0, w: 0}
+  stormDay: 0
+  rainIntensity: 0
+  rainSmoothness: 0
+  charRainSmoothness: 0.2
+  rainflowRate: 1
+  rainCubemap: {fileID: 0}
+  rainRipple: {fileID: 2800000, guid: c07b545827f089f4b959a1810dfd9161, type: 3}
+  rippleConfig: {x: 3, y: 3, z: 0.3, w: 0.5}
+  rainTiling: 1
+  MainLight2CharLight: {fileID: 0}
+  charSkinProfile: {fileID: 0}
+  charMainLightDir: {x: 20, y: 0, z: 0}
+  charMainLightSpecularDirection: 0
+  charFillLightDir: {x: 20, y: 180, z: 0}
+  charMainLightColor: {r: 1, g: 1, b: 1, a: 1}
+  charMainLightIntensity: 1
+  charMainLightIntensityAdditional: 0
+  charFillLightColor: {r: 0, g: 0, b: 0, a: 0}
+  charFillLightIntensity: 1
+  charFillLightIntensityAdditional: 0
+  lightAdditionalRate: 0
+  charAmbientTop: {r: 1, g: 1, b: 1, a: 1}
+  charAmbientDown: {r: 1, g: 1, b: 1, a: 1}
+  charUIAmbientTop: {r: 1, g: 1, b: 1, a: 1}
+  charUIAmbientDown: {r: 1, g: 1, b: 1, a: 1}
+  charToneMapping: 0.9
+  charUIMainLightDir: {x: 30, y: 200, z: 0}
+  charUIFillLightDir: {x: 20, y: -200, z: 0}
+  charUIMainLightColor: {r: 1, g: 1, b: 1, a: 0}
+  charUIMainLightIntensity: 1.25
+  charUIFillLightColor: {r: 1, g: 1, b: 1, a: 0}
+  charUIFillLightIntensity: 1
+  charGlobalEnvIntensity: 0.4
+  charShadowAtten: 0.2
+  charShadowColor: {r: 1, g: 1, b: 1, a: 1}
+  actualCharMainLightColor: {r: 1, g: 1, b: 1, a: 1}
+  actualCharFillLightColor: {r: 0, g: 0, b: 0, a: 1}
+  actualCharUIMainLightColor: {r: 1.6338118, g: 1.6338118, b: 1.6338118, a: 1.25}
+  actualCharUIFillLightColor: {r: 1, g: 1, b: 1, a: 1}
+  actualCharMainLightDir: {x: 0, y: 0.34202012, z: -0.9396926, w: 0}
+  actualCharFillLightDir: {x: 0.00000008215053, y: 0.34202012, z: 0.9396925, w: 0}
+  actualCharUIMainLightDir: {x: 0.29619813, y: 0.49999994, z: 0.81379753, w: 0}
+  actualCharUIFillLightDir: {x: -0.3213938, y: 0.34202012, z: 0.883022, w: 0}
+  GlobalDynamicPointLightIntensity: 1
+  SkyMaterialRenderer: {fileID: 0}
+  SunMaterialRenderer: {fileID: 0}
+  MoonMaterialRenderer: {fileID: 0}
+  MilkywayMaterialRenderer: {fileID: 0}
+  RainbowMaterialRenderer: {fileID: 0}
+  CloudMaterialRenderer: {fileID: 0}
+  MountainsMaterialRenderer: {fileID: 0}
+--- !u!182 &182929818112630808
+WindZone:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1720245379001306}
+  m_Enabled: 1
+  m_Mode: 0
+  m_Radius: 20
+  m_WindMain: 1
+  m_WindTurbulence: 1
+  m_WindPulseMagnitude: 0.5
+  m_WindPulseFrequency: 0.01
