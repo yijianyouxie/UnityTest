@@ -50,6 +50,7 @@ namespace GPUClothSimulation
                     _meshRenderer.material = MeshMat;
                     MeshMat.SetTexture("_PositionTex", _clothSim.GetPositionBuffer());
                     MeshMat.SetTexture("_NormalTex", _clothSim.GetNormalBuffer());
+                    MeshMat.SetTexture("_MainTex", _clothSim.GetMainTexture());
 
                     // 初始化完成
                     _isInit = true;

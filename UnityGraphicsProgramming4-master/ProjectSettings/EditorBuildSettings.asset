@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/GPUClothSimulation/Scenes/GPUClothSimulation.unity
+    guid: 99206ce6e41ab9944ba5f131232ee4b4
   m_configObjects: {}

@@ -33,7 +33,7 @@ namespace GPUClothSimulation
         // 参照碰撞用球体的transform
         public Transform CollisionSphereTransform;
         public Transform BodyTr;
-        private Vector3 BodyTrLastPos;
+        //private Vector3 BodyTrLastPos;
 
         [Header("Resources")]
         // 用于计算的ComputeShader
@@ -45,6 +45,8 @@ namespace GPUClothSimulation
         private RenderTexture[] _posPrevBuff;
         // 布模拟法线数据缓冲
         private RenderTexture _normBuff;
+        // 布料的颜色贴图
+        private RenderTexture _MainTexture;
 
         // 布的长度（横，纵）
         private Vector2 _totalClothLength;
@@ -68,6 +70,11 @@ namespace GPUClothSimulation
         {
             return this.IsInit ? _normBuff : null;
         }
+
+        public RenderTexture GetMainTexture()
+        {
+            return this.IsInit ? _MainTexture : null;
+        }
         // 获取布的分辨率
         public Vector2Int GetClothResolution()
         {
@@ -79,27 +86,34 @@ namespace GPUClothSimulation
         
         void Start()
         {
+#if UNITY_EDITOR
+            if (Application.isEditor)
+            {
+                EditorApplication.ExecuteMenuItem("Edit/Graphics Emulation/No Emulation");
+            }
+#endif
             var w = ClothResolution.x;
             var h = ClothResolution.y;
             var format = RenderTextureFormat.ARGBFloat;
-            //var format = RenderTextureFormat.ARGB32;
+            //var format = RenderTextureFormat.ARGBHalf;
             var filter = FilterMode.Point; // 过滤模式为点差值，避免像素之间的插值
             // 创建RT
             CreateRenderTexture(ref _posBuff,     w, h, format, filter);
             CreateRenderTexture(ref _posPrevBuff, w, h, format, filter);
             CreateRenderTexture(ref _normBuff,    w, h, format, filter);
+            CreateRenderTexture(ref _MainTexture, w, h, format, filter);
             // 重置模拟数据
             ResetBuffer();
             // 初始化的标志设置为true
             IsInit = true;
 
-            if(null != BodyTr)
-            {
-                BodyTrLastPos = BodyTr.position;
-            }else
-            {
-                Debug.LogError("====BodyTr is null.");
-            }
+            //if(null != BodyTr)
+            //{
+            //    BodyTrLastPos = BodyTr.position;
+            //}else
+            //{
+            //    Debug.LogError("====BodyTr is null.");
+            //}
 
             str += "Init true.\n";
         }
@@ -111,7 +125,7 @@ namespace GPUClothSimulation
                 ResetBuffer();
 
             //模拟前设定披风根部的位置
-            SetPifengRootPos();
+            //SetPifengRootPos();
 
             // 进行模拟
             Simulation();
@@ -123,6 +137,7 @@ namespace GPUClothSimulation
             DestroyRenderTexture(ref _posBuff    );
             DestroyRenderTexture(ref _posPrevBuff);
             DestroyRenderTexture(ref _normBuff   );
+            DestroyRenderTexture(ref _MainTexture);
 
             str += "OnDestroy.\n";
         }
@@ -132,7 +147,7 @@ namespace GPUClothSimulation
             // 绘制包含模拟数据的RT以进行调试
             DrawSimulationBufferOnGUI();
 
-            //DrawComputeSupport();
+            DrawComputeSupport();
         }
         
         // 重置模拟用的数据
@@ -160,6 +175,7 @@ namespace GPUClothSimulation
             cs.SetTexture(kernelId, "_PositionBufferRW",     _posBuff[0]);
             cs.SetTexture(kernelId, "_PositionPrevBufferRW", _posPrevBuff[0]);
             cs.SetTexture(kernelId, "_NormalBufferRW",       _normBuff);
+            cs.SetTexture(kernelId, "_MainTexture",          _MainTexture);
             // 运行内核
             cs.Dispatch(kernelId, groupThreadsX, groupThreadsY, 1);
             // 复制缓冲区
@@ -169,17 +185,17 @@ namespace GPUClothSimulation
             str += "ResetBuffer.\n";
         }
 
-        void SetPifengRootPos()
-        {
-            if(null != BodyTr)
-            {
-                var pos = BodyTr.position - BodyTrLastPos;
-            }
-            else
-            {
-                Debug.LogError("====SetPifengRootPos, BodyTr is null.");
-            }
-        }
+        //void SetPifengRootPos()
+        //{
+        //    if(null != BodyTr)
+        //    {
+        //        var pos = BodyTr.position - BodyTrLastPos;
+        //    }
+        //    else
+        //    {
+        //        Debug.LogError("====SetPifengRootPos, BodyTr is null.");
+        //    }
+        //}
 
         // 模拟
         void Simulation()
@@ -209,9 +225,9 @@ namespace GPUClothSimulation
             if (CollisionSphereTransform != null)
             {
                 Vector3 collisionSpherePos = CollisionSphereTransform.position;
-                float collisionSphereRad = 
-                    CollisionSphereTransform.localScale.x * 0.5f + 0.01f;
-                cs.SetBool  ("_EnableCollideSphere", true);
+                //float collisionSphereRad = 
+                //    CollisionSphereTransform.localScale.x * 0.5f + 0.01f;
+                cs.SetBool  ("_EnableCollideSphere", enableSphere);
                 cs.SetFloats("_CollideSphereParams", 
                     new float[4] {
                         collisionSpherePos.x,
@@ -231,11 +247,12 @@ namespace GPUClothSimulation
                 cs.SetTexture(kernelId, "_PositionBufferRW",     _posBuff[1]);
                 cs.SetTexture(kernelId, "_PositionPrevBufferRW", _posPrevBuff[1]);
 
-                cs.SetTexture(kernelId, "_NormalBufferRW",       _normBuff);
+                //cs.SetTexture(kernelId, "_NormalBufferRW",       _normBuff);
+                cs.SetTexture(kernelId, "_MainTexture",          _MainTexture);
                 // 执行线程
                 cs.Dispatch(kernelId, groupThreadsX, groupThreadsY, 1);
                 // 替换读入缓存器和写入缓存器
-                SwapBuffer(ref _posBuff[0],     ref _posBuff[1]    );
+                SwapBuffer(ref _posBuff[0], ref _posBuff[1]);
                 SwapBuffer(ref _posPrevBuff[0], ref _posPrevBuff[1]);
             }
 
@@ -363,12 +380,20 @@ namespace GPUClothSimulation
                 GUI.DrawTexture(r20, _normBuff);
                 GUI.Label(r20, "NormalBuffer");
             }
+            if(_MainTexture != null)
+            {
+                Rect r30 = new Rect(rw * 3, rh * 0, rw, rh);
+                GUI.DrawTexture(r30, _MainTexture);
+                GUI.Label(r30, "_MainTexture");
+            }
 
             GUI.color = storeColor;
         }
 
-        private string computeSupport = "";
+        //private string computeSupport = "";
         private string str = "";
+        private bool enableSphere = false;
+        float collisionSphereRad = 0f;
         void DrawComputeSupport()
         {
             GUIStyle titleStyle2 = new GUIStyle();
@@ -385,11 +410,28 @@ namespace GPUClothSimulation
             }
 
             //执行过程
-            str = GUI.TextArea(new Rect(0, 0, 600, 800), str);
+            //str = GUI.TextArea(new Rect(0, 0, 600, 800), str);
             if (GUI.Button(new UnityEngine.Rect(Screen.width * 1 / 2, 210, 150, 50), "清空日志"))
             {
                 str = "";
             }
+            if (GUI.Button(new UnityEngine.Rect(Screen.width * 1 / 2, 270, 150, 50), "控制撞击球生效" + enableSphere))
+            {
+                enableSphere = !enableSphere;
+            }
+            if (GUI.Button(new UnityEngine.Rect(Screen.width * 1 / 2, 330, 150, 50), "球半径" + collisionSphereRad))
+            {
+                if(collisionSphereRad <= 0f)
+                {
+                    collisionSphereRad = CollisionSphereTransform.localScale.x * 0.5f + 0.01f;
+                }else
+                {
+                    collisionSphereRad = 0f;
+                }
+            }
+
+            GUI.Label(new UnityEngine.Rect(Screen.width - 165, 405, 150, 50), VerletIterationNum.ToString());
+            VerletIterationNum = (int)GUI.HorizontalSlider(new UnityEngine.Rect(Screen.width - 150, 410, 150, 50), VerletIterationNum, 1, 16);
         }
         public static string GetOpenGL()
         {

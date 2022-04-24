@@ -13,6 +13,8 @@ RWTexture2D<float4> _PositionPrevBufferRW;
 RWTexture2D<float4> _PositionBufferRW;
 // 法线数据写入用
 RWTexture2D<float4> _NormalBufferRW;
+//颜色贴图
+RWTexture2D<float4> _MainTexture;
 
 int2   _ClothResolution;  // 布的分辨率(大小)(横，纵)
 float2 _TotalClothLength; // 布的总长度
@@ -26,7 +28,7 @@ float  _InverseMass;	  // 1.0/質量
 
 float  _TimeStep;		  // 时间步长的大小
 
-bool   _EnableCollideSphere; // 是否进行碰撞处理的标志
+bool   _EnableCollideSphere = false; // 是否进行碰撞处理的标志
 float4 _CollideSphereParams; // 碰撞处理参数(pos.xyz, radius)
 
 // 邻近分区的ID偏移(x, y)的排列
@@ -58,15 +60,16 @@ void CSInit(uint3 DTid : SV_DispatchThreadID)
 	uint2 idx = DTid.xy;
 
 	// 位置(设定每个小节点的位置，索引是从0-64.组是2，每个组里是32)
-	float3 pos = float3(idx.x * _RestLength, idx.y * _RestLength, 0);
+	float3 pos = float3(idx.x * _RestLength + 2, idx.y * _RestLength, 0);
 	//设置小节点的偏移
-	pos.xy -= _TotalClothLength.xy * 0.5;
+	//pos.xy -= _TotalClothLength.xy * 0.5;
 	// 法线
 	float3 nrm = float3(0, 0, -1);
 	// 写入缓冲区
 	_PositionPrevBufferRW[idx] = float4(pos.xyz, 1.0);
 	_PositionBufferRW[idx]     = float4(pos.xyz, 1.0);
 	_NormalBufferRW[idx]       = float4(nrm.xyz, 1.0);
+	_MainTexture[idx]		   = float4(pos.xxx/3.2*255.0, 1.0);
 }
 
 // 进行模拟的内核
@@ -89,6 +92,7 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 
 	// 将重力的值代入，作为初始值。
 	float3 force = _Gravity.xyz;
+	//float3 force = 0;
 	// 1.0 / 質量
 	float  invMass = _InverseMass;
 	
@@ -133,7 +137,7 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 		// 计算相邻区间的弹簧的自然长度
 		float  restLength = length(neighCoord * _RestLength);
 		// 计算弹簧的力
-		force += (currDiff*(length(posDiff)-restLength))*_Stiffness-vel*_Damp;
+		force += (currDiff*(length(posDiff)-restLength))*_Stiffness-vel*_Damp /*+ float3(2.0,-2.5,0)*/;
 		// 加算
 		if (k < 8) iters += 1.0;
 	}
@@ -147,23 +151,25 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 
 	// 贝莱法的位置计算
 	float3 tmp = pos;
-	pos = pos * 2.0 - posPrev + acc * (_TimeStep * _TimeStep);
+	pos = pos * 2.0 - posPrev + acc * (_TimeStep * _TimeStep)/* + float3(0.001,0.001,0)*/;
 	posPrev = tmp; // 前一个时间步长的位置
 
 	// 计算碰撞
-	if (_EnableCollideSphere)
-	{
-		float3 center = _CollideSphereParams.xyz; // 中心位置
-		float  radius = _CollideSphereParams.w;   // 半径
+	//if (_EnableCollideSphere)
+	//{
+	//	float3 center = _CollideSphereParams.xyz; // 中心位置
+	//	float  radius = _CollideSphereParams.w;   // 半径
 
-		if (length(pos - center) < radius)
-		{
-			// 计算从撞击球的中心到布的边缘位置的单位向量
-			float3 collDir = normalize(pos - center);
-			// 在撞击球的表面移动边缘位置
-			pos = center + collDir * radius;
-		}
-	}
+	//	if (length(pos - center) < radius)
+	//	{
+	//		// 计算从撞击球的中心到布的边缘位置的单位向量
+	//		float3 collDir = normalize(pos - center);
+	//		// 在撞击球的表面移动边缘位置
+	//		return;
+	//		//pos = center + collDir * radius;
+	//		//pos = 0;
+	//	};
+	//}
 
 	// 写入
 	_PositionBufferRW[idx.xy]     = float4(pos.xyz,     1.0);
@@ -171,4 +177,5 @@ void CSSimulation(uint2 DTid : SV_DispatchThreadID)
 	/*_PositionBufferRW[idx.xy] = float4(1,0,0, 1.0);
 	_PositionPrevBufferRW[idx.xy] = float4(0,1,0, 1.0);*/
 	_NormalBufferRW[idx.xy]       = float4(normal.xyz,  1.0);
+	_MainTexture[idx.xy]		  = float4(pos.xxx/3.2, 1.0);
 }

@@ -34,14 +34,14 @@
 
         fixed4 _Color;
 
-		sampler2D _PositionTex; // 位置データ
-		sampler2D _NormalTex;   // 法線データ
+		sampler2D _PositionTex; // 位置数据
+		sampler2D _NormalTex;   // 法線数据
 
 		void vert(inout appdata_full v)
 		{
-			// 位置情報を取得しセット
+			// 获取位置信息
 			v.vertex.xyz = tex2Dlod(_PositionTex, float4(v.texcoord.xy, 0.0, 0.0)).xyz;
-			// 法線情報を取得しセット
+			// 获取法线信息
 			v.normal.xyz = tex2Dlod(_NormalTex,   float4(v.texcoord.xy, 0.0, 0.0)).xyz;
 		}
 

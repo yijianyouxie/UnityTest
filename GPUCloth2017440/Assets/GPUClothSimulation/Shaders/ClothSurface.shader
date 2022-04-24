@@ -41,7 +41,7 @@
 		{
 			//这里修改的都是模型的顶点位置和模型的顶点法线，是模型坐标系
 			// 获取位置信息
-			v.vertex.xyz = tex2Dlod(_PositionTex, float4(v.texcoord.xy, 0.0, 0.0)).xyz;
+			//v.vertex.xyz = tex2Dlod(_PositionTex, float4(v.texcoord.xy, 0.0, 0.0)).xyz;
 			// 获取法线信息
 			v.normal.xyz = tex2Dlod(_NormalTex,   float4(v.texcoord.xy, 0.0, 0.0)).xyz;
 		}

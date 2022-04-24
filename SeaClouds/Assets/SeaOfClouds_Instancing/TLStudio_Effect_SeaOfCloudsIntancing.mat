@@ -22,13 +22,17 @@ Material:
         m_Texture: {fileID: 11700000, guid: 9c8769e7d7b7aaf45b255c1c57273954, type: 2}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: edb610e4ba4226749b5dce59a6c28b9c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _CloudDensity: 0.9
-    - _CloudPower: 1.58
+    - _CloudDensity: 1.51
+    - _CloudPower: 0.39
     - _FogIntensity: 1
     - _InvFade: 0.11
     - _dither: 0.1
-    - _tiling: 0.37
+    - _tiling: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _DownColor: {r: 0.66619813, g: 0.89705884, b: 0.89705884, a: 1}

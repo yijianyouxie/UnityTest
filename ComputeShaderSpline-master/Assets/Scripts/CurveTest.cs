@@ -104,14 +104,14 @@ namespace Alpacasking
             SplineShader.SetBuffer(kernel, "NodePoints", nodePointBuffer);
             SplineShader.SetInt("ControlPointAmount", vector3s.Length);
             SplineShader.SetInt("NodeAmount", SmoothAmount);
-            SplineShader.Dispatch(kernel, SmoothAmount, 1, 1);
+            SplineShader.Dispatch(kernel, 100, 1, 1);
             var nodePoints = new Vector3[SmoothAmount];
             nodePointBuffer.GetData(nodePoints);
             for (int i = 0; i < SmoothAmount; i++)
             {
                 Gizmos.color = color;
                 Gizmos.DrawSphere(nodePoints[i], Ratio);
-                Debug.LogError("====" + nodePoints[i]);
+                Debug.LogError("====" + nodePoints[i] + " :" + SmoothAmount);
             }
             nodePointBuffer.Release();
             controlPointBuffer.Release();

@@ -7,65 +7,65 @@ namespace GPUClothSimulation
     [RequireComponent(typeof(GPUClothSimulation))]
     public class GPUClothRenderer : MonoBehaviour
     {
-        // メッシュ描画のためのマテリアル
+        // 网格材质
         public Material MeshMat;
 
-        // MeshRendererを取得
+        // MeshRenderer
         private MeshRenderer _meshRenderer;
 
-        // シミュレーションを行うコンポーネントを取得
+        // 进行模拟的组件
         private GPUClothSimulation _clothSim;
 
-        // メッシュ生成など, 初期化済みかどうか
+        // 是否初始化
         private bool _isInit = false;
 
         void Update()
         {
-            // 初期化
+            // 初始化
             Init();
         }
 
         void OnDestroy()
         {
-            // 作成したMeshRendererを削除
+            // 删除已经创建的MeshRenderer
             if (_meshRenderer != null) MeshRenderer.Destroy(_meshRenderer);
         }
 
-        // 初期化
+        // 初始化
         void Init()
         {
-            // 初期化済みでなければ
+            // 如果没有初始化
             if (!_isInit)
             {
-                // 参照を取得
+                // 获取布料模拟组件
                 if (_clothSim == null)
                     _clothSim = GetComponent<GPUClothSimulation>();
 
                 if (_clothSim != null && _clothSim.IsInit)
                 {
-                    // メッシュを生成
+                    // 生成Mesh
                     GenerateMesh();
 
-                    // メッシュ描画のためのマテリアルをMeshRendererのセット
+                    // 设置材质
                     _meshRenderer.material = MeshMat;
                     MeshMat.SetTexture("_PositionTex", _clothSim.GetPositionBuffer());
                     MeshMat.SetTexture("_NormalTex", _clothSim.GetNormalBuffer());
 
-                    // 初期化完了のフラグをセット
+                    // 初始化完成
                     _isInit = true;
                 }
             }
         }
 
-        // メッシュを生成
+        // 生成Mesh
         void GenerateMesh()
         {
-            // メッシュの解像度を計算
+            // 计算网格的分辨率
             Vector2Int clothResolution = _clothSim.GetClothResolution();
             int gridWidth  = clothResolution.x - 1;
             int gridHeight = clothResolution.y - 1;
 
-            // MeshRendererを取得, または作成
+            // MeshRenderer
             if (!GetComponent<MeshRenderer>())
                 _meshRenderer = gameObject.AddComponent<MeshRenderer>();
             else
@@ -74,18 +74,18 @@ namespace GPUClothSimulation
             _meshRenderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
             _meshRenderer.receiveShadows = false;
 
-            // MeshFilterを作成
+            // MeshFilter
             MeshFilter meshFilter;
             if (!GetComponent<MeshFilter>())
                 meshFilter = gameObject.AddComponent<MeshFilter>();
             else
                 meshFilter = GetComponent<MeshFilter>();
 
-            // Meshを作成
+            // Mesh数据
             var mesh = new Mesh();
             meshFilter.mesh = mesh;
 
-            // グリッドの間隔
+            // 网格的间隔
             var tileSizeX = 1.0f / gridWidth;
             var tileSizeY = 1.0f / gridHeight;
 
@@ -100,10 +100,14 @@ namespace GPUClothSimulation
                 for (var x = 0; x < gridWidth; x++)
                 {
                     // 頂点を追加
-                    vertices.Add(new Vector3(x * tileSizeX, y * tileSizeY, 0));
-                    vertices.Add(new Vector3((x + 1) * tileSizeX, y * tileSizeY, 0));
-                    vertices.Add(new Vector3((x + 1) * tileSizeX, (y + 1) * tileSizeY, 0));
-                    vertices.Add(new Vector3(x * tileSizeX, (y + 1) * tileSizeY, 0));
+                    var v1 = new Vector3(x * tileSizeX, y * tileSizeY, 0);
+                    var v2 = new Vector3((x + 1) * tileSizeX, y * tileSizeY, 0);
+                    var v3 = new Vector3((x + 1) * tileSizeX, (y + 1) * tileSizeY, 0);
+                    var v4 = new Vector3(x * tileSizeX, (y + 1) * tileSizeY, 0);
+                    vertices.Add(v1);
+                    vertices.Add(v2);
+                    vertices.Add(v3);
+                    vertices.Add(v4);
                     // 頂点インデックスを追加
                     triangles.Add(index + 2);
                     triangles.Add(index + 1);

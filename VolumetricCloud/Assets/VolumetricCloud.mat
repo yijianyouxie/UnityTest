@@ -89,7 +89,7 @@ Material:
     - _TaperPower: 2.52
     - _UVSec: 0
     - _ZWrite: 1
-    - _cloudHeight: 100
+    - _cloudHeight: 2.48
     - _midYValue: -50
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

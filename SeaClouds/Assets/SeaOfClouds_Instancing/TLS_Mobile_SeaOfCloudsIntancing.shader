@@ -93,8 +93,8 @@
 
                 
 
-				o.uv1 = v.uv  + float3(_Time.y * 0.001, 0.05, 0);
-				o.uv2 = v.uv  + float3(_Time.y * 0.01,0,0);
+				o.uv1 = v.uv  + float3(UNITY_ACCESS_INSTANCED_PROP(Props, _offset)*0.01 + _Time.y * 0.01, 0.05, 0);
+				o.uv2 = v.uv  + float3(_Time.y * 0.01,0.05,0);
                 v.vertex.xyz += UNITY_ACCESS_INSTANCED_PROP(Props, _offset) * v.normal;
                 o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                 //o.worldNormal = normalize(UnityObjectToWorldNormal(v.normal));

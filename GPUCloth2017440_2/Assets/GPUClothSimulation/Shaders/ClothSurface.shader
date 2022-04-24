@@ -1,4 +1,4 @@
-﻿Shader "Hidden/GPUClothSimulation/ClothSurface"
+﻿Shader "GPUClothSimulation/ClothSurface"
 {
     Properties
     {
@@ -43,15 +43,15 @@
 			// 获取位置信息
 			v.vertex.xyz = tex2Dlod(_PositionTex, float4(v.texcoord.xy, 0.0, 0.0)).xyz;
 			// 获取法线信息
-			v.normal.xyz = tex2Dlod(_NormalTex,   float4(v.texcoord.xy, 0.0, 0.0)).xyz;
+			//v.normal.xyz = tex2Dlod(_NormalTex,   float4(v.texcoord.xy, 0.0, 0.0)).xyz;
 		}
 
         void surf (Input IN, inout SurfaceOutputStandard o)
         {
             fixed4 c = tex2D (_MainTex, IN.uv_MainTex.xy) * _Color;
             o.Albedo     = c.rgb;
-			o.Metallic   = _Metallic;
-            o.Smoothness = _Glossiness;
+			/*o.Metallic   = _Metallic;
+            o.Smoothness = _Glossiness;*/
             o.Alpha      = c.a;
         }
         ENDCG

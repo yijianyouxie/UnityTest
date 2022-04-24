@@ -301,7 +301,7 @@ Prefab:
     - target: {fileID: 114088024702400438, guid: 3fb69f5ae1df27342adbed57ac3342e8,
         type: 2}
       propertyPath: High
-      value: 6.93
+      value: 7.93
       objectReference: {fileID: 0}
     - target: {fileID: 114088024702400438, guid: 3fb69f5ae1df27342adbed57ac3342e8,
         type: 2}
