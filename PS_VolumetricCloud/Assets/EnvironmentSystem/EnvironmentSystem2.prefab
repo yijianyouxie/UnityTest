@@ -34,13 +34,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1720245379001306}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: 0.032564186, y: 0.33063838, z: 0.018080955, w: 0.94302225}
+  m_LocalPosition: {x: 117, y: 2.270142, z: 74.84676}
+  m_LocalScale: {x: 0.9, y: 0.8999999, z: 0.8999999}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 2.835068, y: 38.72197, z: 3.193238}
 --- !u!114 &114236785264751768
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -55,19 +55,19 @@ MonoBehaviour:
   enableVolumetricCloud: 1
   VolumetricCloudGO: {fileID: 0}
   VolumetricCloudGOLow: {fileID: 0}
-  CloudMainLightColor: {r: 1, g: 0, b: 0, a: 1}
-  CloudColor: {r: 1, g: 1, b: 1, a: 1}
+  CloudMainLightColor: {r: 0.882353, g: 0.5176471, b: 0, a: 1}
+  CloudColor: {r: 0.7725491, g: 0.6666667, b: 0.6431373, a: 1}
   CloudMainLightDirection: {x: 38.2, y: -42.8, z: -356.9}
   SampleCount: 40
   CloudTilling: {x: 0.14, y: 1.7, z: 0.14}
   Radius: 1000
-  CloudHeight: 634
+  CloudHeight: -172
   MaxTop: 1500
   CurrentTop: 200
   MaxBottom: -200
   CurrentBottom: -100
   Speed: 6.27
-  Density: 2
+  Density: 2.9
   MainLightIntensity: 0.981
   glossyIntensity: 1.91
   NoiseTilling: 0.698
@@ -76,7 +76,7 @@ MonoBehaviour:
   Border: 0.807
   VolumetricCloudBaseHeight: 0
   AtmosphereColorSaturateDistance: 6294
-  AtmosphereColor: {r: 1, g: 0.941785, b: 0.6985294, a: 1}
+  AtmosphereColor: {r: 0.9058824, g: 0.74509805, b: 0.50980395, a: 1}
   emissionIntensity: 0
   globalAOScale: 1
   globalAOIntensity: 1

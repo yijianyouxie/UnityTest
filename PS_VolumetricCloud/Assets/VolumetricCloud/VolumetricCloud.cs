@@ -280,6 +280,8 @@ namespace TLStudio
                 m_VolumetricClouMaterial.SetVector(ShaderPropertyToID.Radius_ID, new Vector2(m_Radius, t_RaidusFallOff));
                 m_VolumetricClouMaterial.SetColor(ShaderPropertyToID.AtmosphereColor_ID, m_AtmosphereColor);
                 m_VolumetricClouMaterial.SetFloat(ShaderPropertyToID.AtmosphereColorSaturateDistance_ID, m_AtmosphereColorSaturateDistance);
+
+                //Debug.LogError("========m_MainLightColor:" + m_MainLightColor + " :" + m_MainLightDirection + " :" + m_BaseTilling + " :" + t_density + " :" + t_bReverse);
                 if (t_bReverse)
                 {
                     m_VolumetricClouMaterial.EnableKeyword("_REVERSE_V");
@@ -297,7 +299,7 @@ namespace TLStudio
                 float y = t_Condition.y;
                 float x = t_Condition.x;
                 float w = t_Condition.w;
-
+                //Debug.LogError("========m_SoftEdge:" + m_SoftEdge + " :" + m_MainLightIntensity + " :" + m_GlossIntensity + " :" + t_Hg + " :" + t_RaidusFallOff + " :" + t_Condition);
                 //default in cloud, 
                 m_VolumetricClouMaterial.EnableKeyword("_RENDER_STATE_1");
                 m_VolumetricClouMaterial.DisableKeyword("_RENDER_STATE_2");
