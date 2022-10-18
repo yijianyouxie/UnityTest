@@ -40,7 +40,7 @@
 
             #pragma vertex vert
             #pragma fragment frag
-            #pragma target 3.0
+            //#pragma target 3.0
 
             
             sampler2D _MainTex;
@@ -117,9 +117,10 @@
                 fixed3 color = ambient + diffuse + specular + rim;
                 color = lerp(_RootColor,color,saturate(pow( _LayerOffset,_FurShadow)));
 
-                fixed3 noise = tex2D(_FurTex, i.uv.zw).rgb;
-                //fixed alpha = saturate(noise - (_LayerOffset * _LayerOffset));
-				fixed alpha = saturate((noise*2-(_LayerOffset *_LayerOffset +(_LayerOffset* FurMask *5)))*_tming);
+				//fixed3 noise = tex2D(_FurTex, i.uv.zw).rgb;
+				fixed3 noise = tex2D(_FurTex, i.uv.xy).rgb;
+                fixed alpha = saturate(noise - (_LayerOffset * _LayerOffset));
+				//fixed alpha = saturate((noise*2-(_LayerOffset *_LayerOffset +(_LayerOffset* FurMask *5)))*_tming);
 
     
                 return fixed4(color * noise, alpha);
