@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: VolumetricCloud
   m_Shader: {fileID: 4800000, guid: 1a19ffd94b4a6d9449324b44aae26c75, type: 3}
-  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _CIRCLE _IN_CLOUD _RENDER_STATE_1 _REVERSE_V
+  m_ShaderKeywords: _ALPHAPREMULTIPLY_ON _CIRCLE _IN_CLOUD _OPTIMIZATION_VERSION
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -28,22 +28,22 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - NoiseIntensity: 15
-    - NoiseTilling: 0.003
+    - NoiseIntensity: 27
+    - NoiseTilling: 0.00698
     - SampleCount: 40
-    - SoftEdge: 0.01
-    - glossIntensity: 1
+    - SoftEdge: 0.0039199996
+    - glossIntensity: 1.91
     - mainLightIntensity: 1
     m_Colors:
-    - BaseTilling: {r: 0.0015, g: 0.002, b: 0.0015, a: 0}
-    - CloudColor: {r: 1, g: 1, b: 1, a: 1}
-    - Condition: {r: -381, g: 119, b: 1, a: 500}
-    - Density: {r: 0.001, g: 1, b: 0, a: 0}
-    - HGParameter: {r: 0.06397457, g: 1.1960719, b: 0.88560003, a: 0}
-    - MainLightColor: {r: 1, g: 1, b: 1, a: 1}
+    - BaseTilling: {r: 0.0014, g: 0.11619999, b: 0.0014, a: 0}
+    - CloudColor: {r: 0.5583406, g: 0.40197787, b: 0.37123778, a: 1}
+    - Condition: {r: -88.39174, g: -63.444138, b: 0, a: -518.6083}
+    - Density: {r: 0.0029000002, g: 1, b: 0, a: 0}
+    - HGParameter: {r: 0.015119723, g: 1.81, b: 1.8, a: 0}
+    - MainLightColor: {r: 0.75294244, g: 0.23074007, b: 0, a: 1}
     - Parameter1: {r: 0.0000463, g: 0.0001083, b: 0.0002643, a: 0}
     - Parameter2: {r: 0.0000154, g: 0.0000234, b: 0.000036, a: 108.66672}
     - Parameter3: {r: 0.002, g: 0.004, b: 0, a: 0}
     - Parameter4: {r: 0.3333333, g: 0.0003333, b: 3, a: 0.01}
-    - Radius: {r: 1000, g: 178.5, b: 0, a: 0}
-    - Speed: {r: -1225.0612, g: -1225.0612, b: -612.5306, a: -612.5306}
+    - Radius: {r: 1000, g: 1000, b: 0, a: 0}
+    - Speed: {r: NaN, g: NaN, b: NaN, a: NaN}

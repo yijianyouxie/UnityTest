@@ -1,0 +1,66 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Pet_blackShibainu_Alb 2
+  m_Shader: {fileID: 4800000, guid: 48411903c7842c946866b9086fbd5e84, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _ControlAddTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalTex:
+        m_Texture: {fileID: 2800000, guid: 9e17ac0fd3179484084ee12b8b5fd995, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DissolveSrc:
+        m_Texture: {fileID: 2800000, guid: 82bc0e4b91697b14e8bcee6bc08bef9f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FlowMap:
+        m_Texture: {fileID: 2800000, guid: 45950ec001ca0f949b22ca6eb10d82a9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FurControlTex:
+        m_Texture: {fileID: 2800000, guid: a55522c5de0ad09499c22c61a6bbcb42, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FurNoiseTex:
+        m_Texture: {fileID: 2800000, guid: b3331e8aeaf09174a90a8f60f8b2650b, type: 3}
+        m_Scale: {x: 10, y: 10}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: cba94818e45294042a08b21118e6a695, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _DissolveAmount: 1
+    - _EnvironmentLightControl: 1
+    - _FlowMapStrength: 0.845
+    - _FurDensity: 0.552
+    - _MaxHairLength: 0.013
+    - _RimPower: 2
+    - _RimStrength: 2
+    - _Thickness: 0.102
+    - _TotalLightControl: 1.3
+    - _UVOffset: 0.05
+    m_Colors:
+    - _BaseColor: {r: 0.764151, g: 0.764151, b: 0.764151, a: 1}
+    - _DecalColor: {r: 1, g: 1, b: 1, a: 1}
+    - _DissolveInfo: {r: 0.6, g: 0.85, b: 0.4, a: 0.66}
+    - _ExtraControl: {r: 0, g: 0, b: 0, a: 0}
+    - _FurColor: {r: 1, g: 1, b: 1, a: 1}

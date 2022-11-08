@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 21c75ada0a2fd364b82ba5e69cefe601
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _MainTex: {instanceID: 0}
+  - _FurControlTex: {instanceID: 0}
+  - _FurNoiseTex: {fileID: 2800000, guid: b3331e8aeaf09174a90a8f60f8b2650b, type: 3}
+  - _FlowMap: {fileID: 2800000, guid: 45950ec001ca0f949b22ca6eb10d82a9, type: 3}
+  - _DissolveSrc: {fileID: 2800000, guid: 82bc0e4b91697b14e8bcee6bc08bef9f, type: 3}
+  - _DecalTex: {fileID: 2800000, guid: 9e17ac0fd3179484084ee12b8b5fd995, type: 3}
+  - _ControlAddTex: {instanceID: 0}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: pet_fur_specular_lod.unity3d
+  assetBundleVariant: 

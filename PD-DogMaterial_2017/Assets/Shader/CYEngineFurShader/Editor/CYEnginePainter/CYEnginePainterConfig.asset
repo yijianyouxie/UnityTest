@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0fbf0176e64bd4438f8f51e1681694e, type: 3}
+  m_Name: CYEnginePainterConfig
+  m_EditorClassIdentifier: 
+  config:
+  - modeName: "Project-D\u72D7\u6BDB\u5DE5\u5177"
+    channelConfig:
+    - channelName: "\u72D7\u6BDB\u957F\u5EA6"
+      channelMinName: 
+      channelMaxName: 
+    - channelName: "\u72D7\u6BDB\u7C97\u7EC6"
+      channelMinName: 
+      channelMaxName: 
+    - channelName: "\u6D41\u5411\u5F3A\u5EA6"
+      channelMinName: 
+      channelMaxName: 
+    paintDestTexName: _FurControlTex
+    paintTexSize: 512
+    maxChannelCount: 3
+    paintMode: 1

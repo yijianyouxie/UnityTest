@@ -40,7 +40,36 @@ public class ShellController : MonoBehaviour
 
     GameObject[] layers;
 
+    //private void OnValidate()
+    //{
+    //    float furOffset = 1.0f / LayerCount;
+    //    for (int i = 0; i < LayerCount; i++)
+    //    {
+    //        //复制渲染的原模型一遍
+    //        GameObject layer = layers[i];
 
+    //        //将原模型的贴图传入Shell材质
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetTexture("_MainTex", Target.sharedMaterial.GetTexture("_MainTex"));
+    //        //将编辑器中的参数传进去
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetColor("_Color", FurColor);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetColor("_RootColor", FurRootColor);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetColor("_RimColor", FurRimColor);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetColor("_Specular", FurSpecularColor);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetFloat("_Shininess", Shininess);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetFloat("_RimPower", RimPower);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetFloat("_FurShadow", FurShadow);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetTexture("_FurTex", FurPattern);
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetFloat("_FurLength", FurLength);
+
+    //        //不同Shell的偏移参数不一样
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetFloat("_LayerOffset", i * furOffset);
+    //        //计算受力、层数和硬度共同影响的Shell偏移
+    //        layer.GetComponent<Renderer>().sharedMaterial.SetVector("_FurOffset", FurForce * Mathf.Pow(i * furOffset, FurTenacity));
+
+    //        //由于在单通道渲染半透明材质,进行了深度写入，为了防止被深度剔除，所以要手动更改渲染队列
+    //        layer.GetComponent<Renderer>().sharedMaterial.renderQueue = 3000 + i;
+    //    }
+    //}
 
     void UpdateShellTrans()
     {
