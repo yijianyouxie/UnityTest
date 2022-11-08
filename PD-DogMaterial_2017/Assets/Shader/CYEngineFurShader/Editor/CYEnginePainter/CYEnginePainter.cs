@@ -181,14 +181,17 @@ public class CYEnginePainter : EditorWindow
         //Read Write Enable
         var mat = currentSelectObject.GetComponent<Renderer>().sharedMaterial;
         var texture = mat.GetTexture(destPainterTexName) as Texture2D;
-        if (texture != null && texture.isReadable == false)
+        if (texture != null /*&& texture.isReadable == false*/)
         {
             var path = AssetDatabase.GetAssetPath(texture);
             var textureIm = AssetImporter.GetAtPath(path) as TextureImporter;
-            textureIm.isReadable = true;
-            textureIm.SaveAndReimport();
-            // AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);//刷新
-            AssetDatabase.ImportAsset(path);
+            if(!textureIm.isReadable)
+            {
+                textureIm.isReadable = true;
+                textureIm.SaveAndReimport();
+                // AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);//刷新
+                AssetDatabase.ImportAsset(path);
+            }
         }
 
         //Mesh Refresh

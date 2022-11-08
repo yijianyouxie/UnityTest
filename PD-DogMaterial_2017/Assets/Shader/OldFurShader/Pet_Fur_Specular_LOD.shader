@@ -111,7 +111,7 @@ Shader "Pet Fur/Pet_FurLOD"
 	  #if UNITY_SHOULD_SAMPLE_SH
 	  half3 sh : TEXCOORD5; // SH
 	  #endif
-	  UNITY_LIGHTING_COORDS(6, 7)
+	  LIGHTING_COORDS(6, 7)
 	  //UNITY_FOG_COORDS(7)
 	  #if SHADER_TARGET >= 30
 	  half4 lmap : TEXCOORD8;
@@ -136,7 +136,7 @@ Shader "Pet Fur/Pet_FurLOD"
 	  half4 tSpace2 : TEXCOORD3;
 	  half custompack0 : TEXCOORD4; // alpha
 	  half4 lmap : TEXCOORD5;
-	  UNITY_LIGHTING_COORDS(6, 7)
+	  LIGHTING_COORDS(6, 7)
 	  //UNITY_FOG_COORDS(7)
 	  half4 pack1: TEXCOORD9;
 	  #ifdef ENABLECLOTHFURCONTROLTEX
