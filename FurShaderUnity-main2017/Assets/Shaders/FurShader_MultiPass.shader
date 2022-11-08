@@ -71,9 +71,10 @@
 		v2f o;
 		float _LayerOffset = 1.0f / _LayerCount * index;
 		o.uv.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
-		//fixed4 n = tex2Dlod(_FurTex, half4(o.uv.xy, 0, 0));
-		float3 OffetVertex = v.vertex.xyz + v.normal * _LayerOffset *_FurLength;//顶点外扩
-		OffetVertex += mul(unity_WorldToObject, _FurOffset * pow(_LayerOffset, _FurTenacity));//顶点受力偏移
+		fixed4 n = tex2Dlod(_FurTex, half4(o.uv.xy, 0, 0));
+		float3 OffetVertex = v.vertex.xyz + v.normal * _LayerOffset *_FurLength * n.a;//顶点外扩
+		half furLengthRatio = step(0.01, _FurLength);
+		OffetVertex = OffetVertex + (mul(unity_WorldToObject, _FurOffset * pow(_LayerOffset, _FurTenacity)) * n.a)*furLengthRatio;//顶点受力偏移		
 
 		o.pos = UnityObjectToClipPos(float4(OffetVertex, 1.0));
 		//o.uv.zw = TRANSFORM_TEX(v.texcoord2, _FurTex);
@@ -96,6 +97,7 @@
 		fixed3 rim = _RimColor.rgb *  _RimColor.a * saturate(1 - pow(1 - vdotn, _RimPower));
 
 		fixed3 ambient = UNITY_LIGHTMODEL_AMBIENT.xyz * albedo;
+		//在近距离时diffuse和specular会有闪烁，但是远距离就没有问题
 		fixed3 diffuse = _LightColor0.rgb * albedo * (0.5f*saturate(dot(worldNormal, worldLight)) + 0.5f);
 		fixed3 specular = _LightColor0.rgb * _Specular.rgb * pow(saturate(dot(worldNormal, worldHalf)), _Shininess);
 
@@ -115,12 +117,44 @@
     SubShader
     {
         Tags { "RenderType" = "Transparent" "IgnoreProjector" = "True" "Queue" = "Transparent" }
+
+		Pass{
+			ZWrite On
+			ColorMask 0
+
+			CGPROGRAM
+			#pragma vertex vert0
+			#pragma fragment frag0
+
+			#include "UnityCG.cginc"
+
+			struct v2f0
+			{
+				float4 vertex : SV_POSITION;
+
+			};
+
+			v2f0 vert0(appdata_full v)
+			{
+				v2f0 o;
+				UNITY_INITIALIZE_OUTPUT(v2f0, o);
+				o.vertex = UnityObjectToClipPos(v.vertex);
+
+				return o;
+			}
+
+			fixed4 frag0(v2f0 i) : SV_Target
+			{
+				return half4(0, 0, 0, 1);
+			}
+			ENDCG
+		}
         
         //Cull Off
 		//改成裁剪后边了，与关闭裁剪的效果相同
 		Cull Back
-        ZWrite On
-        //ZWrite Off
+        //ZWrite On
+        ZWrite Off
         Blend SrcAlpha OneMinusSrcAlpha
 
         Pass
