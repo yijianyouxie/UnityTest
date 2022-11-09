@@ -33,7 +33,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 		_ExtraControl ("其他控制功能，x:胖瘦程度", Vector) = (0, 0, 0, 0)
 		
 		[Space(20)][Header(Decal Effect)][Space(10)]
-		[NoScaleOffset]_DecalTex("贴花图", 2D) = "white" {}
+		[NoScaleOffset]_DecalTex("贴花图", 2D) = "black" {}
 		_DecalColor("贴花颜色", Color) = (1,1,1,1)
 
 		[Space(20)][Header(Cloth Mask)][Space(10)]
@@ -56,7 +56,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -81,7 +81,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -103,7 +103,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -125,7 +125,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 	
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -147,7 +147,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -169,7 +169,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 	
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -192,7 +192,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 		
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -214,7 +214,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 		
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -235,7 +235,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 			CGPROGRAM
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -257,7 +257,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 			CGPROGRAM
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow
@@ -279,7 +279,7 @@ Shader "Pet Fur/CYEnginePetFur10Pass"
 			CGPROGRAM
 			#pragma vertex vert_surf_simplified
 			#pragma fragment frag_surf_simplified
-			#pragma target 3.0
+			//#pragma target 3.0
 
 			#pragma multi_compile_fog
 			#pragma multi_compile_fwdbasealpha noshadow

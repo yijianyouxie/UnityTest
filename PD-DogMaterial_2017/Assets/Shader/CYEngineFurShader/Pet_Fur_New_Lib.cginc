@@ -1,78 +1,78 @@
 
-		#if !defined(INSTANCING_ON)
+//#if !defined(INSTANCING_ON)
 
-		#ifndef UNITY_PASS_FORWARDBASE
-			#define UNITY_PASS_FORWARDBASE
-		#endif
+#ifndef UNITY_PASS_FORWARDBASE
+	#define UNITY_PASS_FORWARDBASE
+#endif
 		
-		#include "UnityCG.cginc"
-		#include "Lighting.cginc"
-		#include "UnityPBSLighting.cginc"
-		#include "AutoLight.cginc"
-		#include "HLSLSupport.cginc"
-		#include "UnityShaderVariables.cginc"
-		#include "UnityShaderUtilities.cginc"
-		sampler2D _MainTex;
-		sampler2D _FurControlTex;
-		fixed4 _MainTex_ST;
+#include "UnityCG.cginc"
+#include "Lighting.cginc"
+#include "UnityPBSLighting.cginc"
+#include "AutoLight.cginc"
+#include "HLSLSupport.cginc"
+#include "UnityShaderVariables.cginc"
+#include "UnityShaderUtilities.cginc"
+sampler2D _MainTex;
+sampler2D _FurControlTex;
+fixed4 _MainTex_ST;
 				
 
-		UNITY_DECLARE_DEPTH_TEXTURE(_ClothFurControlTex);
-		sampler2D _ControlAddTex;
-		sampler2D _FurNoiseTex;
+//UNITY_DECLARE_DEPTH_TEXTURE(_ClothFurControlTex);
+sampler2D _ControlAddTex;
+sampler2D _FurNoiseTex;
 
-	    struct Input 
-		{
-      		fixed alpha;
-          	float4 uv;
-          	float3 worldRefl;
-          	fixed3 viewDir;
-			float3 uv_MainTex1;
-      	};
+struct Input 
+{
+    fixed alpha;
+    float4 uv;
+    float3 worldRefl;
+    fixed3 viewDir;
+	float3 uv_MainTex1;
+};
 
-		fixed4 _FurColor;
-		fixed4 _BaseColor;
-		fixed _MaxHairLength;		
+fixed4 _FurColor;
+fixed4 _BaseColor;
+fixed _MaxHairLength;		
 
-	    half _RimPower;
-		fixed _RimStrength;
+half _RimPower;
+fixed _RimStrength;
 
-		fixed		_DissolveAmount;
-		fixed4		_DissolveInfo;
-		fixed4		_DissolveColor;
-		sampler2D	_DissolveSrc;
+fixed		_DissolveAmount;
+fixed4		_DissolveInfo;
+fixed4		_DissolveColor;
+sampler2D	_DissolveSrc;
 		
-		fixed4		_ExtraControl;
+fixed4		_ExtraControl;
 		
-		sampler2D	_DecalTex;
-		fixed4 		_DecalColor;
+sampler2D	_DecalTex;
+fixed4 		_DecalColor;
 
 
-		fixed4 _FurNoiseTex_ST;
-		sampler2D _FlowMap;
-		fixed _FlowMapStrength;
-		fixed _UVOffset;
-		float _Thickness;
-		float _FurDensity;
-		fixed _TotalLightControl;
-		fixed _EnvironmentLightControl;
+fixed4 _FurNoiseTex_ST;
+sampler2D _FlowMap;
+fixed _FlowMapStrength;
+fixed _UVOffset;
+float _Thickness;
+float _FurDensity;
+fixed _TotalLightControl;
+fixed _EnvironmentLightControl;
 		
-		fixed _Debug_Fur_Control;
+fixed _Debug_Fur_Control;
 		
-		//CGINCLUDE
-		fixed4 Dissolve( fixed4 c, Input surfIN)
-		{
-			fixed ClipTex2 = tex2D (_DissolveSrc, (surfIN.uv_MainTex1.xy+_DissolveInfo.y)/_DissolveInfo.z).r;
-			fixed ClipTex3 = tex2D (_DissolveSrc, (surfIN.uv_MainTex1.yz+_DissolveInfo.y)/_DissolveInfo.z).r;
+//CGINCLUDE
+fixed4 Dissolve( fixed4 c, Input surfIN)
+{
+	fixed ClipTex2 = tex2D (_DissolveSrc, (surfIN.uv_MainTex1.xy+_DissolveInfo.y)/_DissolveInfo.z).r;
+	fixed ClipTex3 = tex2D (_DissolveSrc, (surfIN.uv_MainTex1.yz+_DissolveInfo.y)/_DissolveInfo.z).r;
 			
-			fixed ClipTex = ( ClipTex2 + ClipTex3 )* 0.5;
-			ClipTex -= surfIN.uv_MainTex1.z * _DissolveInfo.w;
-			fixed ClipAmount = max(ClipTex - _DissolveAmount,0);
-			ClipAmount = min( ClipAmount, _DissolveInfo.x);
-			c.xyzw = lerp(c.xyzw, c.xyzw*_DissolveColor*ClipTex, ClipAmount);
+	fixed ClipTex = ( ClipTex2 + ClipTex3 )* 0.5;
+	ClipTex -= surfIN.uv_MainTex1.z * _DissolveInfo.w;
+	fixed ClipAmount = max(ClipTex - _DissolveAmount,0);
+	ClipAmount = min( ClipAmount, _DissolveInfo.x);
+	c.xyzw = lerp(c.xyzw, c.xyzw*_DissolveColor*ClipTex, ClipAmount);
 			
-			return c;
-		}	
+	return c;
+}	
 
 	struct v2f_surf 
 	{
@@ -85,15 +85,15 @@
 		half3 sh : TEXCOORD4; // SH
 	#endif
 		UNITY_FOG_COORDS(5)
-	#if SHADER_TARGET >= 30
+	/*#if SHADER_TARGET >= 30
 		float4 lmap : TEXCOORD6;
-	#endif
-		float4 pack1: TEXCOORD9;
-		UNITY_VERTEX_INPUT_INSTANCE_ID
-		UNITY_VERTEX_OUTPUT_STEREO
-	#ifdef ENABLECLOTHFURCONTROLTEX
-		  float4 projPos : TEXCOORD10;
-	#endif
+	#endif*/
+		float4 pack1: TEXCOORD6;
+	//	UNITY_VERTEX_INPUT_INSTANCE_ID
+	//	UNITY_VERTEX_OUTPUT_STEREO
+	//#ifdef ENABLECLOTHFURCONTROLTEX
+	//	  float4 projPos : TEXCOORD10;
+	//#endif
 	};
 
 	v2f_surf vert_surf_simplified (appdata_full v) 
@@ -154,7 +154,7 @@
 	// fragment shader
 	fixed4 frag_surf_simplified (v2f_surf IN) : SV_Target
 	{
-		UNITY_SETUP_INSTANCE_ID(IN);
+		//UNITY_SETUP_INSTANCE_ID(IN);
 		// prepare and unpack data
 		Input surfIN;
 		UNITY_INITIALIZE_OUTPUT(Input,surfIN);
@@ -234,4 +234,4 @@
 		return c;
 	}
 
-#endif
+//#endif
