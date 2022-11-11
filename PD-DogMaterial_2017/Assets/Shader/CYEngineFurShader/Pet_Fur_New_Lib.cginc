@@ -122,7 +122,7 @@ fixed4 Dissolve( fixed4 c, Input surfIN)
 		float3 worldBinormal = cross(worldNormal, worldTangent) * tangentSign;
 		float3 flowdir = tex2Dlod(_FlowMap, float4(v.texcoord.x, v.texcoord.y, 0, 0)).xyz * 2 - 1;
 		flowdir = worldTangent * flowdir.x + worldBinormal * flowdir.y + worldNormal * flowdir.z;
-		float3 furVertexOffset = normalize(mul(unity_WorldToObject, flowdir)) * _FlowMapStrength * c.b * c.r;
+		float3 furVertexOffset = normalize(mul(unity_WorldToObject, flowdir)) * _FlowMapStrength * c.b /** c.r*/;
 		
 		float hairLength = _MaxHairLength * FURSTEP * c.r;
 	#ifdef DEBUG_FUR
