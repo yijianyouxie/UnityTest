@@ -1,0 +1,328 @@
+﻿// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
+// Upgrade NOTE: commented out 'float4 unity_LightmapST', a built-in variable
+// Upgrade NOTE: commented out 'sampler2D unity_Lightmap', a built-in variable
+// Upgrade NOTE: commented out 'sampler2D unity_LightmapInd', a built-in variable
+// Upgrade NOTE: replaced tex2D unity_Lightmap with UNITY_SAMPLE_TEX2D
+// Upgrade NOTE: replaced tex2D unity_LightmapInd with UNITY_SAMPLE_TEX2D_SAMPLER
+
+// Simplified Diffuse shader. Differences from regular Diffuse one:
+// - no Main Color
+// - fully supports only 1 directional light. Other lights can affect it, but it will be per-vertex/SH.
+
+Shader "TLStudio/Weather/Transparent/IlluminCutout-Weather" {
+Properties {
+	_Color("Color",Color) = (1.0, 1.0, 1.0, 1.0)
+	_MainTex ("Base (RGB)", 2D) = "white" {}
+	_Cutoff("Alpha cutoff", Range(0,1)) = 0.5
+	_Mask ("Mask (R)", 2D) = "white" {}
+	Illumin("Illumin",float) = 0
+	_IlluminColor("IlluminColor", Color) = (1,1,1,1)
+	
+	_TintMask_SnowR_RainR("SnowMask in R Rain Mask in G", 2D) = "white" {}		
+	_TintTex("TintTex if No Mask", 2D) = "white" {}
+	_TintTexTiling("TintTex Tiling", Range(0.01, 50)) = 1 
+	_TintPowerMaxRange("TintPowerMaxRange",Range(0,2)) = 2     
+	_TintNormalEx("Change Color On Side",Range(-0.5,0.5)) = 0.05 
+	_RainMaskPower("Rain Mask Power",Range(0.0,1.0)) = 0.5
+	_NormalNoiseMap("RainDecalMap (RGB) ",2D) = "Black" {}
+	_NormalNoiseSpeed("NormalNoiseSpeed",Range(0,1)) = 1
+	_NormalNoiseTiling("NormalNoiseTiling",Range(0.1,10)) = 1
+	_DecalPower("DecalPower",Range(0,2)) = 1
+	_Decal2Tiling("Decal2Tiling",Range(1,2)) = 1.2
+	
+}
+SubShader {
+	Tags { "Queue"="AlphaTest+50" "IgnoreProjector"="False" "RenderType"="TransparentCutout" }
+	LOD 200
+	Cull Off
+
+
+	// ------------------------------------------------------------
+	// Surface shader code generated out of a CGPROGRAM block:
+	
+
+	// ---- forward rendering base pass:
+	Pass {
+		Name "FORWARD"
+		Tags { "LightMode" = "ForwardBase" }
+		ColorMask RGBA
+
+CGPROGRAM
+#pragma skip_variants DIRLIGHTMAP_COMBINED LIGHTMAP_SHADOW_MIXING VERTEXLIGHT_ON SHADOWS_CUBE SHADOWS_DEPTH FOG_EXP POINT SPOT
+// compile directives
+#pragma vertex vert_surf
+#pragma fragment frag_surf
+#pragma multi_compile_fwdbase
+#pragma multi_compile FOG_EXP2 FOG_LINEAR
+#include "HLSLSupport.cginc"
+#include "UnityShaderVariables.cginc"
+#define UNITY_PASS_FORWARDBASE
+#include "Assets/TLS_Shaders/UnityCG.cginc"
+#include "Assets/TLS_Shaders/CGIncludes/Lighting.cginc"
+#include "Assets/TLS_Shaders/CGIncludes/AutoLight.cginc"
+
+#define INTERNAL_DATA
+#define WorldReflectionVector(data,normal) data.worldRefl
+#define WorldNormalVector(data,normal) normal
+
+// Original surface shader snippet:
+#line 14 ""
+#ifdef DUMMY_PREPROCESSOR_TO_WORK_AROUND_HLSL_COMPILER_LINE_HANDLING
+#endif
+
+//#pragma surface surf Lambert noforwardadd alphatest:_Cutoff
+
+#ifndef VAR_TINT_TEX 
+	#define VAR_TINT_TEX
+#endif
+
+#include "../../TLS_Shaders/Weather/Include/TintColor.cginc"
+#include "../../TLS_Shaders/Weather/Include/NoiseAndDecal.cginc"
+#include "../../TLS_Shaders/Weather/Include/CommonCal.cginc"
+
+sampler2D _MainTex,_Mask;
+	fixed4 _Color,_IlluminColor;
+	float Illumin;
+
+		VAR_TINT_COLOR_NEED 
+		VAR_NOISE_DECAL_NEED
+
+struct Input {
+	float2 uv_MainTex;
+	float3 worldPosition;
+	float3 worldNormal;
+};
+
+float _EmissionIntensity;
+
+void surf (Input IN, inout SurfaceOutput o) {
+	fixed4 c = tex2D(_MainTex, IN.uv_MainTex);
+
+	if (TINT_ENABLE > 0)
+	{
+		TINT_TEX_MASKMAP_BASECOLOR_DOT_AUTO_UV(IN.worldPosition, IN.worldNormal, IN.uv_MainTex, c.rgb)
+	}
+	
+	if (RAIN_ENABLE > 0)
+	{
+		//DECAL_COLOR_WORLD_CENTER(IN.worldPos,IN.worldNormal,c.rgb)   
+		DECAL_COLOR_MASKMAP_S_R_WORLD_CENTER(IN.worldPosition,IN.worldNormal,IN.uv_MainTex,c.rgb)  
+	}
+	
+	fixed4 e = tex2D(_Mask, IN.uv_MainTex);
+    float intensity = lerp(0, Illumin, _EmissionIntensity);
+	o.Albedo = c.rgb*_Color.rgb+intensity*e*c.rgb*_IlluminColor.rgb;
+	o.Alpha = c.a*_Color.a;
+}
+
+
+// vertex-to-fragment interpolation data
+		#ifdef LIGHTMAP_OFF
+			struct v2f_surf {
+				float4 pos : SV_POSITION;
+				half2 pack0 : TEXCOORD0;
+				// half3 worldNormal : TEXCOORD1;
+				// float3 worldPos : TEXCOORD2;
+				float4 worldNormal : TEXCOORD1;
+				float4 worldTangent : TEXCOORD2;
+				float4 worldBinormal : TEXCOORD3;
+		#if UNITY_SHOULD_SAMPLE_SH
+				half3 sh : TEXCOORD4; // SH
+		#endif
+				UNITY_SHADOW_COORDS(5)
+				UNITY_FOG_COORDS(6)
+		#if SHADER_TARGET >= 30
+				float4 lmap : TEXCOORD7;
+		#endif
+		#ifdef GLOBALSH_ENABLE
+				float3 vlighting : TEXCOORD8;
+		#else
+		#endif
+			};
+		#endif
+
+			// with lightmaps:
+		#ifndef LIGHTMAP_OFF
+			struct v2f_surf {
+			float4 pos : SV_POSITION;
+			half2 pack0 : TEXCOORD0;
+			// half3 worldNormal : TEXCOORD1;
+			// float3 worldPos : TEXCOORD2;
+			float4 worldNormal : TEXCOORD1;
+			float4 worldTangent : TEXCOORD2;
+			float4 worldBinormal : TEXCOORD3;
+			float4 lmap : TEXCOORD4;
+			UNITY_SHADOW_COORDS(5)
+			UNITY_FOG_COORDS(6)
+		#ifdef GLOBALSH_ENABLE
+			float3 vlighting : TEXCOORD7;
+		#else
+		#endif
+			};
+		#endif
+
+			float4 _MainTex_ST;
+			fixed _Cutoff;
+
+			// vertex shader
+			v2f_surf vert_surf(appdata_full v) {
+				v2f_surf o;
+				UNITY_INITIALIZE_OUTPUT(v2f_surf,o);
+				o.pos = UnityObjectToClipPos(v.vertex);
+				o.pack0.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
+				float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+				float3 worldNormal = UnityObjectToWorldNormal(v.normal);
+				// o.worldPos = worldPos;
+				// o.worldNormal = worldNormal;
+
+				float4 tangentWorld = float4(UnityObjectToWorldDir(v.tangent.xyz), v.tangent.w);
+		        float3x3 tangentToWorld = CreateTangentToWorldPerVertex(worldNormal, tangentWorld.xyz, tangentWorld.w);
+		        o.worldTangent.xyz = tangentToWorld[0];
+		        o.worldBinormal.xyz = tangentToWorld[1];
+		        o.worldNormal.xyz = tangentToWorld[2];
+				o.worldTangent.w = worldPos.x;
+		        o.worldBinormal.w = worldPos.y;
+		        o.worldNormal.w = worldPos.z;
+				
+		#ifndef DYNAMICLIGHTMAP_OFF
+				o.lmap.zw = v.texcoord2.xy * unity_DynamicLightmapST.xy + unity_DynamicLightmapST.zw;
+		#endif
+		#ifndef LIGHTMAP_OFF
+				o.lmap.xy = v.texcoord1.xy * unity_LightmapST.xy + unity_LightmapST.zw;
+		#endif
+
+				// SH/ambient and vertex lights
+		#ifdef LIGHTMAP_OFF
+		#if UNITY_SHOULD_SAMPLE_SH
+				o.sh = 0;
+				// Approximated illumination from non-important point lights
+		#ifdef VERTEXLIGHT_ON
+				o.sh += Shade4PointLights(
+					unity_4LightPosX0, unity_4LightPosY0, unity_4LightPosZ0,
+					unity_LightColor[0].rgb, unity_LightColor[1].rgb, unity_LightColor[2].rgb, unity_LightColor[3].rgb,
+					unity_4LightAtten0, worldPos, worldNormal);
+		#endif
+				o.sh = ShadeSHPerVertex(worldNormal, o.sh);
+		#endif
+		#endif // LIGHTMAP_OFF
+		#ifdef GLOBALSH_ENABLE
+				o.vlighting = ShadeSH9(float4(worldNormal, 1.0));
+		#endif
+				UNITY_TRANSFER_SHADOW(o, v.texcoord1); // pass shadow coordinates to pixel shader
+				if(UseHeightFog > 0)
+				{
+					TL_TRANSFER_FOG(o,o.pos, v.vertex);
+				}else
+				{
+					UNITY_TRANSFER_FOG(o,o.pos); // pass fog coordinates to pixel shader				
+				}
+				return o;
+			}
+
+			// fragment shader
+			fixed4 frag_surf(v2f_surf IN) : SV_Target{
+				// prepare and unpack data
+				Input surfIN;
+				UNITY_INITIALIZE_OUTPUT(Input,surfIN);
+				surfIN.uv_MainTex.x = 1.0;
+				surfIN.uv_MainTex = IN.pack0.xy;
+				float3 worldPos = float3(IN.worldTangent.w, IN.worldBinormal.w, IN.worldNormal.w);
+				float3 worldNormal = IN.worldNormal.xyz;
+				surfIN.worldPosition = worldPos;
+				surfIN.worldNormal = worldNormal;
+				// return fixed4((normalize(worldNormal)+1)/2,1);
+			#ifndef USING_DIRECTIONAL_LIGHT
+				fixed3 lightDir = normalize(UnityWorldSpaceLightDir(worldPos));
+			#else
+				fixed3 lightDir = _WorldSpaceLightPos0.xyz;
+			#endif
+			#ifdef UNITY_COMPILER_HLSL
+				SurfaceOutput o = (SurfaceOutput)0;
+			#else
+				SurfaceOutput o;
+			#endif
+				o.Albedo = 0.0;
+				o.Emission = 0.0;
+				o.Specular = 0.0;
+				o.Alpha = 0.0;
+				o.Gloss = 0.0;
+				fixed3 normalWorldVertex = fixed3(0,0,1);
+				o.Normal = worldNormal;
+				normalWorldVertex = worldNormal;
+
+
+				// call surface function
+				surf(surfIN, o);
+
+				// alpha test
+				clip(o.Alpha - _Cutoff);
+
+				// compute lighting & shadowing factor
+				UNITY_LIGHT_ATTENUATION(atten, IN, worldPos)
+				//atten = 0.5;
+				fixed4 c = 0;
+
+				// Setup lighting environment
+				UnityGI gi;
+				UNITY_INITIALIZE_OUTPUT(UnityGI, gi);
+				gi.indirect.diffuse = 0;
+				gi.indirect.specular = 0;
+			#if defined(LIGHTMAP_ON)
+				gi.light.color = _LightColor0.rgb;
+				gi.light.dir = lightDir*1.5;
+				gi.light.ndotl = LambertTerm(o.Normal, gi.light.dir);
+			#endif
+				// Call GI (lightmaps/SH/reflections) lighting function
+				UnityGIInput giInput;
+				UNITY_INITIALIZE_OUTPUT(UnityGIInput, giInput);
+				giInput.light = gi.light;
+				giInput.worldPos = worldPos;
+				giInput.atten = atten;
+			#if defined(LIGHTMAP_ON) || defined(DYNAMICLIGHTMAP_ON)
+				giInput.lightmapUV = IN.lmap;
+			#else
+				giInput.lightmapUV = 0.0;
+			#endif
+			#if UNITY_SHOULD_SAMPLE_SH && LIGHTMAP_OFF
+				giInput.ambient = IN.sh;
+			#else
+				giInput.ambient.rgb = 0.0;
+			#endif
+				giInput.probeHDR[0] = unity_SpecCube0_HDR;
+				giInput.probeHDR[1] = unity_SpecCube1_HDR;
+			#if UNITY_SPECCUBE_BLENDING || UNITY_SPECCUBE_BOX_PROJECTION
+				giInput.boxMin[0] = unity_SpecCube0_BoxMin; // .w holds lerp value for blending
+			#endif
+			#if UNITY_SPECCUBE_BOX_PROJECTION
+				giInput.boxMax[0] = unity_SpecCube0_BoxMax;
+				giInput.probePosition[0] = unity_SpecCube0_ProbePosition;
+				giInput.boxMax[1] = unity_SpecCube1_BoxMax;
+				giInput.boxMin[1] = unity_SpecCube1_BoxMin;
+				giInput.probePosition[1] = unity_SpecCube1_ProbePosition;
+			#endif
+				LightingLambert_GI(o, giInput, gi);
+
+				c += LightingLambert(o, gi);
+
+				//#ifdef GLOBALSH_ENABLE
+				//  c.xyz = c.xyz*max(fixed3(1.0,1.0,1.0),(IN.vlighting - UNITY_LIGHTMODEL_AMBIENT.xyz)*2);
+				//#endif
+				if(UseHeightFog > 0)
+				{
+					TL_APPLY_FOG(IN.fogCoord, c.rgb);
+				}else
+				{
+					UNITY_APPLY_FOG(IN.fogCoord, c); // apply fog				
+				}
+				//UNITY_OPAQUE_ALPHA(c.a);
+				return c;
+			}
+
+			ENDCG
+
+		}
+	}
+	Fallback "Transparent/Cutout/VertexLit"
+}

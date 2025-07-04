@@ -1,0 +1,192 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &146430
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 4
+  m_Component:
+  - 4: {fileID: 461998}
+  - 108: {fileID: 10852202}
+  - 114: {fileID: 11451612}
+  m_Layer: 0
+  m_Name: GlobalSH
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &461998
+Transform:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146430}
+  m_LocalRotation: {x: 0.40821794, y: -0.23456973, z: 0.109381676, w: 0.87542605}
+  m_LocalPosition: {x: 106.60023, y: 66.73897, z: 14.765051}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+--- !u!108 &10852202
+Light:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146430}
+  m_Enabled: 1
+  serializedVersion: 6
+  m_Type: 1
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Intensity: 0
+  m_Range: 10
+  m_SpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_Lightmapping: 4
+  m_BounceIntensity: 1
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
+  m_AreaSize: {x: 1, y: 1}
+--- !u!114 &11451612
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 146430}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 63b4f60a3b8c4324e8f85d389becd3a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  RandomMinTime: 5
+  RandomMaxTime: 15
+  DurationTimes: 2
+  TimeCurve:
+    m_Curve:
+    - time: 0.017366529
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    - time: 0.14832069
+      value: 0.86003095
+      inSlope: 1.1603534
+      outSlope: 1.1603534
+      tangentMode: 0
+    - time: 0.22188164
+      value: 0.1629402
+      inSlope: 1.0637408
+      outSlope: 1.0637408
+      tangentMode: 0
+    - time: 0.39022303
+      value: 1.0903342
+      inSlope: 1.0190904
+      outSlope: 1.0190904
+      tangentMode: 0
+    - time: 0.4716804
+      value: 0.048818164
+      inSlope: -0.62812316
+      outSlope: -0.62812316
+      tangentMode: 0
+    - time: 0.5382978
+      value: 0.497315
+      inSlope: 1.989752
+      outSlope: 1.989752
+      tangentMode: 0
+    - time: 0.6188994
+      value: 0.06930262
+      inSlope: 0.1574825
+      outSlope: 0.1574825
+      tangentMode: 0
+    - time: 0.72033376
+      value: 0.1201732
+      inSlope: 0.17275314
+      outSlope: 0.17275314
+      tangentMode: 0
+    - time: 0.82266176
+      value: 0.899008
+      inSlope: 0.1296401
+      outSlope: 0.1296401
+      tangentMode: 0
+    - time: 0.9515669
+      value: 0.35781473
+      inSlope: 0.067683846
+      outSlope: 0.067683846
+      tangentMode: 0
+    - time: 1.0822524
+      value: 1.9544072
+      inSlope: -0.52437186
+      outSlope: -0.52437186
+      tangentMode: 0
+    - time: 1.1293837
+      value: 1.3617942
+      inSlope: 4.4749975
+      outSlope: 4.4749975
+      tangentMode: 0
+    - time: 1.1966217
+      value: 0.16536349
+      inSlope: -0.38311666
+      outSlope: -0.38311666
+      tangentMode: 0
+    - time: 1.2121816
+      value: 1.0693916
+      inSlope: 0.13239682
+      outSlope: 0.13239682
+      tangentMode: 0
+    - time: 1.435807
+      value: 0.15986738
+      inSlope: -0.36209822
+      outSlope: -0.36209822
+      tangentMode: 0
+    - time: 1.4802074
+      value: 0.7808226
+      inSlope: -2.4738908
+      outSlope: -2.4738908
+      tangentMode: 0
+    - time: 1.5097896
+      value: 0.52378464
+      inSlope: -4.852414
+      outSlope: -4.852414
+      tangentMode: 0
+    - time: 1.5874946
+      value: 0.60751116
+      inSlope: -1.893118
+      outSlope: -1.893118
+      tangentMode: 0
+    - time: 1.6116287
+      value: 0.090047866
+      inSlope: -6.43909
+      outSlope: -6.43909
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  CtrlLight: {fileID: 10852202}
+  SoundResID: -1
+--- !u!1001 &100100000
+Prefab:
+  m_ObjectHideFlags: 1
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications: []
+    m_RemovedComponents: []
+  m_ParentPrefab: {fileID: 0}
+  m_RootGameObject: {fileID: 146430}
+  m_IsPrefabParent: 1
