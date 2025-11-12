@@ -1177,7 +1177,7 @@ RectTransform:
   m_Children:
   - {fileID: 1433434362}
   m_Father: {fileID: 1830907184}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -1725,7 +1725,7 @@ MonoBehaviour:
   volume: +0%
   pitch: +0Hz
   textToConvert: "\u8FD9\u662F\u4E00\u4E2A\u793A\u4F8B\u6587\u672C\uFF0C\u7528\u4E8E\u6F14\u793A\u5982\u4F55\u5728Unity\u4E2D\u4F7F\u7528EasyVoice\u670D\u52A1\u8FDB\u884C\u6D41\u5F0F\u6587\u672C\u8F6C\u8BED\u97F3\u64AD\u653E\u3002"
-  forceWavFormat: 1
+  forceWavFormat: 0
 --- !u!4 &1190331079
 Transform:
   m_ObjectHideFlags: 0
@@ -2601,7 +2601,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1830907184}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
@@ -2904,6 +2904,8 @@ MonoBehaviour:
   rateSlider: {fileID: 1249412308}
   pitchSlider: {fileID: 787762516}
   volumeSlider: {fileID: 1421389596}
+  localRemoteBtn: {fileID: 0}
+  localRemoteText: {fileID: 0}
   ttsStream: {fileID: 1190331078}
   ttsAdvancedStream: {fileID: 197757837}
 --- !u!1 &1676742231
@@ -3230,9 +3232,9 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_Children:
   - {fileID: 1555388858}
+  - {fileID: 1559320363}
   - {fileID: 861812599}
   - {fileID: 2124784730}
-  - {fileID: 1559320363}
   - {fileID: 125951359}
   - {fileID: 1249412307}
   - {fileID: 787762515}
@@ -3550,7 +3552,7 @@ RectTransform:
   m_Children:
   - {fileID: 1843456665}
   m_Father: {fileID: 1830907184}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}

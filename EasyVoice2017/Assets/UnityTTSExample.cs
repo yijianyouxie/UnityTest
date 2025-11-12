@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,9 @@ public class UnityTTSExample : MonoBehaviour
     public Slider rateSlider;
     public Slider pitchSlider;
     public Slider volumeSlider;
+
+    public Button localRemoteBtn;
+    public Text localRemoteText;
     
     [Header("TTS Components")]
     public UnityTTSStream ttsStream;
@@ -24,53 +28,89 @@ public class UnityTTSExample : MonoBehaviour
     
     private string[] availableVoices = {
         "zh-CN-XiaoxiaoNeural",
+        "zh-CN-XiaoyiNeural",
+        "zh-CN-YunjianNeural",
         "zh-CN-YunxiNeural",
-        "en-US-JennyNeural",
-        "en-US-GuyNeural",
-        "ja-JP-NanamiNeural",
-        "ko-KR-SunHiNeural"
+        "zh-CN-YunxiaNeural",
+        "zh-CN-YunyangNeural",
+        "zh-CN-liaoning-XiaobeiNeural",
+        "zh-CN-shaanxi-XiaoniNeural",
+        "zh-HK-HiuGaaiNeural",
+        "zh-HK-WanLungNeural",
+        "zh-TW-HsiaoChenNeural",
+        "zh-TW-YunJheNeural",
     };
-    
+
+    private static bool isLocalURL = true;
+    private static string localURL = "http://localhost:3000/api/v1/tts";
+    private static string remoteURL = "https://8.131.145.224/api/v1/tts";
+
     void Start()
     {
         SetupUI();
         UpdateStatus("Ready to convert text to speech");
+
+        UpdateURL();
         
+        Debug.Log("TTS Example initialized. Platform: " + Application.platform);
+    }
+
+    public static string GetTargetUrl()
+    {
+        if(isLocalURL)
+        {
+            return localURL;
+        }
+        else
+        {
+            return remoteURL;
+        }
+    }
+
+    private void UpdateURL()
+    {
+        if(isLocalURL)
+        {
+            //localRemoteText.text = "Local";
+        }
+        else
+        {
+            localRemoteText.text = "Remote";
+        }
         // 确保在移动平台上设置正确的URL
 #if UNITY_ANDROID || UNITY_IOS
         if (ttsStream != null)
         {
             // 在移动设备上使用HTTPS URL
-            ttsStream.ttsServiceUrl = "https://8.131.145.224/api/v1/tts";
+            ttsStream.ttsServiceUrl = GetTargetUrl();
         }
-        
+
         if (ttsAdvancedStream != null)
         {
             // 在移动设备上使用HTTPS URL
-            ttsAdvancedStream.ttsServiceUrl = "https://8.131.145.224/api/v1/tts";
+            ttsAdvancedStream.ttsServiceUrl = GetTargetUrl();
         }
 #else
         // 在编辑器中可以使用本地URL进行测试
         if (ttsStream != null && string.IsNullOrEmpty(ttsStream.ttsServiceUrl))
         {
-            ttsStream.ttsServiceUrl = "https://8.131.145.224/api/v1/tts";
+            ttsStream.ttsServiceUrl = GetTargetUrl();
         }
         
         if (ttsAdvancedStream != null && string.IsNullOrEmpty(ttsAdvancedStream.ttsServiceUrl))
         {
-            ttsAdvancedStream.ttsServiceUrl = "https://8.131.145.224/api/v1/tts";
+            ttsAdvancedStream.ttsServiceUrl = GetTargetUrl();
         }
 #endif
-        
-        Debug.Log("TTS Example initialized. Platform: " + Application.platform);
     }
-    
+
     private void SetupUI()
     {
         // Setup button listeners
         playButton.onClick.AddListener(OnPlayButtonClicked);
         stopButton.onClick.AddListener(OnStopButtonClicked);
-        
+        //localRemoteBtn.onClick.AddListener(OnLocalRemoteBtnClicked);
+
         // Setup voice dropdown
         List<string> voiceOptions = new List<string>(availableVoices);
         voiceDropdown.ClearOptions();
@@ -103,7 +143,14 @@ public class UnityTTSExample : MonoBehaviour
         // Start streaming
         ttsStream.StartTTSStreaming(UpdateStatus);
     }
-    
+    private void OnLocalRemoteBtnClicked()
+    {
+        isLocalURL = !isLocalURL;
+        UpdateURL();
+        UpdateStatus("OnLocalRemoteBtnClicked, isLocalURL:" + isLocalURL);
+    }
+
+
     private void OnStopButtonClicked()
     {
         ttsStream.StopTTSStreaming();
@@ -163,5 +210,10 @@ public class UnityTTSExample : MonoBehaviour
         
         // Start advanced streaming
         ttsAdvancedStream.StartTTSStreaming();
+    }
+
+    public static string GetTimestamp()
+    {
+        return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
     }
 }
