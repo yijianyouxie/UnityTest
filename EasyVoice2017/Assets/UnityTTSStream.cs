@@ -384,9 +384,10 @@ public class UnityTTSStream : MonoBehaviour
                                 if (clip != null && clip.length > 0)
                                 {
                                     audioSource.clip = clip;
+                                    audioSource.time = 0;
                                     audioSource.Play();
                                     startedPlayback = true;
-                                    Debug.Log("Started playing audio with length: " + clip.length + " seconds. File size: " + fileLength + " bytes");
+                                    Debug.LogError("Started playing audio with length: " + clip.length + " seconds. File size: " + fileLength + " bytes" + " timePos:" + audioSource.time);
                                 }
                                 else
                                 {
@@ -478,7 +479,7 @@ public class UnityTTSStream : MonoBehaviour
                                         if (wasPlaying && !audioSource.isPlaying)
                                         {
                                             audioSource.Play();
-                                            Debug.Log("Resumed playback after clip reload");
+                                            Debug.LogError("Resumed playback after clip reload. timePos:" + audioSource.time);
                                         }
                                         Debug.Log("Reloaded audio clip with additional data. New length: " + newClip.length + " seconds");
                                     }
@@ -584,7 +585,7 @@ public class UnityTTSStream : MonoBehaviour
                         {
                             audioSource.clip = clip;
                             audioSource.Play();
-                            Debug.Log("Played remaining audio with length: " + clip.length + " seconds");
+                            Debug.LogError("Played remaining audio with length: " + clip.length + " seconds" + " timePos:" + audioSource.time);
                             
                             // Wait for playback to finish
                             while (audioSource.isPlaying)
