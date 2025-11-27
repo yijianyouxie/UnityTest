@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -209,5 +210,10 @@ public class UnityTTSExample : MonoBehaviour
         
         // Start advanced streaming
         ttsAdvancedStream.StartTTSStreaming();
+    }
+
+    public static string GetTimestamp()
+    {
+        return DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ");
     }
 }
