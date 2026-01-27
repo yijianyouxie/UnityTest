@@ -251,4 +251,55 @@ afterEvaluate {
     //     }
     // }
 
+    // Copy custom libmain.so from CustomUnityLibs into src/main/jniLibs to override Unity libmain.so
+    // When Gradle runs this script the `rootDir` points to the exported gradle project (Temp/gradleOut).
+    // The Unity project root is two levels up from gradleOut. Use that to find the real CustomUnityLibs.
+    def unityProjectRoot = rootDir.parentFile?.parentFile ?: rootDir
+    def customLibsRoot = file(new File(unityProjectRoot, "CustomUnityLibs"))
+    def targetJniLibs = file("$projectDir/src/main/jniLibs")
+    println "[copyCustomLibs] unityProjectRoot: ${unityProjectRoot}"
+    println "[copyCustomLibs] customLibsRoot path: ${customLibsRoot} exists: ${customLibsRoot.exists()}"
+    try {
+        def cfgLog = new File(unityProjectRoot, "copyCustomLibs_config.log")
+        cfgLog.text = "[copyCustomLibs] unityProjectRoot: ${unityProjectRoot}\n[copyCustomLibs] customLibsRoot path: ${customLibsRoot} exists: ${customLibsRoot.exists()}\n"
+    } catch(Exception e) {
+        println "[copyCustomLibs] failed to write config log: ${e}"
+    }
+
+    task copyCustomLibs {
+        doLast {
+            println "[copyCustomLibs] task start. customLibsRoot.exists()=${customLibsRoot.exists()}"
+            def runLog = new File(unityProjectRoot, "copyCustomLibs.log")
+            try { runLog.withWriterAppend { it << "[copyCustomLibs] task start. customLibsRoot.exists()=${customLibsRoot.exists()}\n" } } catch(Exception e) { println "[copyCustomLibs] failed to write run log: ${e}" }
+            if (!customLibsRoot.exists()) {
+                println "[copyCustomLibs] CustomUnityLibs directory does not exist. Skipping copy."
+                try { runLog.withWriterAppend { it << "[copyCustomLibs] CustomUnityLibs directory does not exist. Skipping copy.\n" } } catch(Exception e) { println "[copyCustomLibs] failed to write run log: ${e}" }
+                return
+            }
+            def copied = 0
+            println "[copyCustomLibs] scanning CustomUnityLibs: ${customLibsRoot}"
+            customLibsRoot.eachFileRecurse { f ->
+                if (f.name == 'libmain.so') {
+                    def abiDir = f.parentFile.name
+                    def destDir = new File(targetJniLibs, abiDir)
+                    destDir.mkdirs()
+                    project.copy {
+                        from f
+                        into destDir
+                    }
+                    copied++
+                    println "[copyCustomLibs] copied ${f} -> ${destDir}${File.separator}libmain.so"
+                }
+            }
+            if (copied == 0) {
+                println "[copyCustomLibs] no libmain.so found under CustomUnityLibs, nothing copied."
+                try { runLog.withWriterAppend { it << "[copyCustomLibs] no libmain.so found under CustomUnityLibs, nothing copied.\n" } } catch(Exception e) { println "[copyCustomLibs] failed to write run log: ${e}" }
+            } else {
+                println "[copyCustomLibs] total libmain.so files copied: ${copied}"
+                try { runLog.withWriterAppend { it << "[copyCustomLibs] total libmain.so files copied: ${copied}\n" } } catch(Exception e) { println "[copyCustomLibs] failed to write run log: ${e}" }
+            }
+        }
+    }
+    preBuild.dependsOn copyCustomLibs
+
 }
