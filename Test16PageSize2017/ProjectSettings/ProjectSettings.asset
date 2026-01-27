@@ -241,11 +241,11 @@ PlayerSettings:
   tvOSManualSigningProvisioningProfileID: 
   appleEnableAutomaticSigning: 0
   clonedFromGUID: 00000000000000000000000000000000
-  AndroidTargetArchitectures: 7
+  AndroidTargetArchitectures: 2
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: D:/Study/UnityTest/Test16PageSize2017/keystore/com.tencent.tmgp.tstl.keystore
-  AndroidKeyaliasName: com.tencent.tmgp.tstl.dj
+  AndroidKeystoreName: 
+  AndroidKeyaliasName: 
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
   AndroidEnableTango: 0
@@ -560,7 +560,7 @@ PlayerSettings:
   scriptingBackend:
     Android: 1
   incrementalIl2cppBuild: {}
-  additionalIl2CppArgs: 
+  additionalIl2CppArgs: --linker-flags="-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
   scriptingRuntimeVersion: 0
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
